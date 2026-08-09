@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/joho/godotenv"
 
@@ -16,6 +17,14 @@ import (
 func main() {
 	if err := godotenv.Load(); err != nil {
 		log.Println(".env not found")
+	}
+
+	if envFile := ".env." + os.Getenv("APP_ENV"); envFile != ".env." {
+		if _, err := os.Stat(envFile); err == nil {
+			if err := godotenv.Overload(envFile); err != nil {
+				log.Println("failed to load", envFile)
+			}
+		}
 	}
 
 	cfg := config.Load()
