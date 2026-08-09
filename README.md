@@ -76,13 +76,21 @@ migrate -path migrations -database "postgresql://<user>:<password>@ep-xxx.c-3.ap
 
 ## CI/CD (GitHub Actions)
 
-Alur otomatis di `.github/workflows/ci.yml`:
+Alur otomatis di `.github/workflows/ci.yml` — cabang GitHub memetakan branch Neon:
 
 | Event                          | Aksi                                             |
 | ------------------------------ | ------------------------------------------------ |
-| PR ke `main`                   | Test (vet + build)                               |
-| Push ke `main`                 | Test + migrasi ke branch **testing** Neon        |
-| Tag `v*` (release)             | Test + migrasi branch **production** + deploy VPS |
+| PR ke `main` / `test`          | Test (vet + build)                               |
+| Push ke branch `test`          | Test + migrasi ke branch **testing** Neon        |
+| Push ke branch `main`          | Test + migrasi branch **production** + deploy VPS |
+
+Alur kerja harian:
+
+```text
+fitur → push ke test          → CI migrasi Neon testing, tes manual dari laptop
+      → PR test → main        → job test jalan
+      → merge ke main         → CI migrasi Neon production + deploy VPS
+```
 
 App testing tetap dijalankan manual dari local (`APP_ENV=testing go run ./cmd/api`).
 
@@ -150,14 +158,9 @@ sudo systemctl enable --now sistem-service-motor
 
 5. (Opsional) Pasang nginx/caddy sebagai reverse proxy + domain ke port `8080`.
 
-### Release
+### Deploy ke production
 
-Setelah semua setup di atas, cukup buat tag versi — migrasi production dan deploy berjalan otomatis:
-
-```bash
-git tag v1.0.0
-git push origin v1.0.0
-```
+Setelah semua setup di atas, deploy & migrasi production berjalan otomatis saat **merge ke branch `main`**. Tidak perlu tag versi.
 
 ## PostgreSQL lokal (opsional)
 
