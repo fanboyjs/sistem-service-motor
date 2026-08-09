@@ -58,6 +58,103 @@ APP_ENV=testing go run ./cmd/api
 
 > Windows (cmd/PowerShell): `$env:APP_ENV="testing"; go run ./cmd/api`
 
+### Migrasi per branch
+
+Jalankan migrasi dengan script `scripts/migrate.sh` (membaca `DATABASE_URL` dari file env yang sesuai):
+
+```bash
+./scripts/migrate.sh testing        # migrate up ke branch testing
+./scripts/migrate.sh production     # migrate up ke branch production
+./scripts/migrate.sh testing down   # rollback 1 langkah
+```
+
+Atau manual dengan direct URL:
+
+```bash
+migrate -path migrations -database "postgresql://<user>:<password>@ep-xxx.c-3.ap-southeast-1.aws.neon.tech/<dbname>?sslmode=require" up
+```
+
+## CI/CD (GitHub Actions)
+
+Alur otomatis di `.github/workflows/ci.yml`:
+
+| Event                          | Aksi                                             |
+| ------------------------------ | ------------------------------------------------ |
+| PR ke `main`                   | Test (vet + build)                               |
+| Push ke `main`                 | Test + migrasi ke branch **testing** Neon        |
+| Tag `v*` (release)             | Test + migrasi branch **production** + deploy VPS |
+
+App testing tetap dijalankan manual dari local (`APP_ENV=testing go run ./cmd/api`).
+
+### Secrets GitHub yang diperlukan
+
+Di **Settings → Secrets → Actions**:
+
+| Secret                 | Isi                                              |
+| ---------------------- | ------------------------------------------------ |
+| `NEON_TESTING_URL`     | Direct URL branch testing                        |
+| `NEON_PRODUCTION_URL`  | Direct URL branch production                     |
+| `VPS_HOST`             | IP VPS (cth: Rumahweb)                           |
+| `VPS_USER`             | User deploy di VPS                               |
+| `VPS_SSH_KEY`          | Private key SSH (deploy key)                     |
+| `VPS_DATABASE_URL`     | Direct URL production (ditulis ke `.env` di VPS) |
+
+## Deploy ke VPS (cth:Rumahweb)
+
+Setup satu kali (manual):
+
+1. **Folder app** di VPS:
+
+```bash
+mkdir -p /home/<user>/apps/sistem-service-motor
+```
+
+2. **SSH key** — generate di lokal:
+
+```bash
+ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519_deploy -C "deploy"
+```
+
+Salin pubkey (`~/.ssh/id_ed25519_deploy.pub`) ke `/home/<user>/.ssh/authorized_keys` di VPS. Isi private key ke secret `VPS_SSH_KEY`.
+
+3. **Systemd unit** `/etc/systemd/system/sistem-service-motor.service`:
+
+```ini
+[Unit]
+Description=Sistem Service Motor API
+After=network.target
+
+[Service]
+Type=simple
+User=<user>
+WorkingDirectory=/home/<user>/apps/sistem-service-motor
+EnvironmentFile=/home/<user>/apps/sistem-service-motor/.env
+ExecStart=/home/<user>/apps/sistem-service-motor/server
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
+```
+
+4. **Aktifkan service**:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now sistem-service-motor
+```
+
+5. (Opsional) Pasang nginx/caddy sebagai reverse proxy + domain ke port `8080`.
+
+### Release
+
+Setelah semua setup di atas, cukup buat tag versi — migrasi production dan deploy berjalan otomatis:
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
 ## PostgreSQL lokal (opsional)
 
 Untuk development tanpa Neon, gunakan docker compose:
