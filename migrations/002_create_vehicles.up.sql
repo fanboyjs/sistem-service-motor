@@ -1,0 +1,14 @@
+CREATE TABLE vehicles (
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    plate_number VARCHAR(30) NOT NULL,
+    brand VARCHAR(50) NOT NULL,
+    model VARCHAR(50) NOT NULL,
+    production_year VARCHAR(50) NOT NULL,
+    chassis_number VARCHAR(50) NOT NULL,
+    engine_number VARCHAR(50) NOT NULL,
+    current_mileage INTEGER NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
