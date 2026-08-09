@@ -1,10 +1,11 @@
-# Go Gin PostgreSQL REST API
+# Sistem Service Motor
 
-Starter template for a REST API using Go, Gin, PostgreSQL and pgx.
+Backend sistem service motor.
 
 ## Architecture
 
-Request -> Handler -> Service -> Repository -> PostgreSQL
+- Golang Gin
+- Postgresql
 
 ## Run
 
@@ -30,4 +31,4 @@ go run ./cmd/api
 
 API:
 
-`GET /api/v1/users`
+`GET /api/users`
