@@ -60,26 +60,38 @@ jobs:
           NEON_URL: ${{ secrets.NEON_PRODUCTION_URL }}
         run: migrate -path migrations -database "$NEON_URL" -verbose up
 
-  deploy:
-    if: startsWith(github.ref, 'refs/tags/v') && secrets.VPS_HOST != '' && secrets.VPS_USER != '' && secrets.VPS_SSH_KEY != '' && secrets.VPS_DATABASE_URL != ''
+  check-deploy:
+    if: startsWith(github.ref, 'refs/tags/v')
     needs: [test, migrate-production]
+    runs-on: ubuntu-latest
+    outputs:
+      ready: ${{ steps.check.outputs.ready }}
+    steps:
+      - name: Cek konfigurasi VPS
+        id: check
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          VPS_DATABASE_URL: ${{ secrets.VPS_DATABASE_URL }}
+        run: |
+          if [ -n "$VPS_HOST" ] && [ -n "$VPS_USER" ] && [ -n "$VPS_SSH_KEY" ] && [ -n "$VPS_DATABASE_URL" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+            echo "VPS terkonfigurasi, deploy akan dijalankan."
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Secret VPS belum lengkap, job deploy dilewati."
+          fi
+
+  deploy:
+    if: needs.check-deploy.outputs.ready == 'true'
+    needs: [check-deploy]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
           go-version: '1.25'
-      - name: Validasi secret VPS
-        env:
-          HOST: ${{ secrets.VPS_HOST }}
-          USER: ${{ secrets.VPS_USER }}
-          KEY: ${{ secrets.VPS_SSH_KEY }}
-          DB_URL: ${{ secrets.VPS_DATABASE_URL }}
-        run: |
-          test -n "$HOST" || { echo "::error::Secret VPS_HOST belum di-set"; exit 1; }
-          test -n "$USER" || { echo "::error::Secret VPS_USER belum di-set"; exit 1; }
-          test -n "$KEY" || { echo "::error::Secret VPS_SSH_KEY belum di-set"; exit 1; }
-          test -n "$DB_URL" || { echo "::error::Secret VPS_DATABASE_URL belum di-set"; exit 1; }
       - name: Build binary linux/amd64
         run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath -o server ./cmd/api
       - name: Copy binary ke VPS
