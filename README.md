@@ -88,16 +88,20 @@ App testing tetap dijalankan manual dari local (`APP_ENV=testing go run ./cmd/ap
 
 ### Secrets GitHub yang diperlukan
 
-Di **Settings → Secrets → Actions**:
+Di **Settings → Secrets and variables → Actions** — **wajib dibuat**, tanpa ini job migrate/deploy gagal:
 
 | Secret                 | Isi                                              |
 | ---------------------- | ------------------------------------------------ |
 | `NEON_TESTING_URL`     | Direct URL branch testing                        |
 | `NEON_PRODUCTION_URL`  | Direct URL branch production                     |
-| `VPS_HOST`             | IP VPS (cth: Rumahweb)                           |
-| `VPS_USER`             | User deploy di VPS                               |
-| `VPS_SSH_KEY`          | Private key SSH (deploy key)                     |
-| `VPS_DATABASE_URL`     | Direct URL production (ditulis ke `.env` di VPS) |
+| `VPS_HOST`             | IP VPS Rumahweb (**wajib untuk deploy**)         |
+| `VPS_USER`             | User deploy di VPS (**wajib untuk deploy**)      |
+| `VPS_SSH_KEY`          | Private key SSH (**wajib untuk deploy**)         |
+| `VPS_DATABASE_URL`     | Direct URL production (**wajib untuk deploy**)   |
+
+> Migrasi di CI memakai binary [golang-migrate v4.19.1](https://github.com/golang-migrate/migrate/releases) yang diunduh di runner, bukan container Docker.
+
+> **Deploy VPS otomatis di-skip** sampai keempat secret VPS di-set. Begitu VPS siap dan secret dibuat, job `deploy` langsung aktif tanpa ubah kode.
 
 ## Deploy ke VPS (cth:Rumahweb)
 

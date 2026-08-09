@@ -26,14 +26,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Migrate branch testing
+      - name: Validasi secret NEON_TESTING_URL
+        env:
+          URL: ${{ secrets.NEON_TESTING_URL }}
         run: |
-          docker run --rm \
-            -v "$PWD/migrations:/migrations" \
-            migrate/migrate:v4 \
-            -path /migrations \
-            -database "${{ secrets.NEON_TESTING_URL }}" \
-            up
+          test -n "$URL" || { echo "::error::Secret NEON_TESTING_URL belum di-set di Settings > Secrets > Actions"; exit 1; }
+      - name: Install golang-migrate
+        run: |
+          curl -sL https://github.com/golang-migrate/migrate/releases/download/v4.19.1/migrate.linux-amd64.tar.gz | tar xz
+          sudo mv migrate /usr/local/bin/
+      - name: Migrate branch testing
+        env:
+          NEON_URL: ${{ secrets.NEON_TESTING_URL }}
+        run: migrate -path migrations -database "$NEON_URL" -verbose up
 
   migrate-production:
     if: startsWith(github.ref, 'refs/tags/v')
@@ -41,17 +46,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Migrate branch production
+      - name: Validasi secret NEON_PRODUCTION_URL
+        env:
+          URL: ${{ secrets.NEON_PRODUCTION_URL }}
         run: |
-          docker run --rm \
-            -v "$PWD/migrations:/migrations" \
-            migrate/migrate:v4 \
-            -path /migrations \
-            -database "${{ secrets.NEON_PRODUCTION_URL }}" \
-            up
+          test -n "$URL" || { echo "::error::Secret NEON_PRODUCTION_URL belum di-set di Settings > Secrets > Actions"; exit 1; }
+      - name: Install golang-migrate
+        run: |
+          curl -sL https://github.com/golang-migrate/migrate/releases/download/v4.19.1/migrate.linux-amd64.tar.gz | tar xz
+          sudo mv migrate /usr/local/bin/
+      - name: Migrate branch production
+        env:
+          NEON_URL: ${{ secrets.NEON_PRODUCTION_URL }}
+        run: migrate -path migrations -database "$NEON_URL" -verbose up
 
   deploy:
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: startsWith(github.ref, 'refs/tags/v') && secrets.VPS_HOST != '' && secrets.VPS_USER != '' && secrets.VPS_SSH_KEY != '' && secrets.VPS_DATABASE_URL != ''
     needs: [test, migrate-production]
     runs-on: ubuntu-latest
     steps:
@@ -59,6 +69,17 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: '1.25'
+      - name: Validasi secret VPS
+        env:
+          HOST: ${{ secrets.VPS_HOST }}
+          USER: ${{ secrets.VPS_USER }}
+          KEY: ${{ secrets.VPS_SSH_KEY }}
+          DB_URL: ${{ secrets.VPS_DATABASE_URL }}
+        run: |
+          test -n "$HOST" || { echo "::error::Secret VPS_HOST belum di-set"; exit 1; }
+          test -n "$USER" || { echo "::error::Secret VPS_USER belum di-set"; exit 1; }
+          test -n "$KEY" || { echo "::error::Secret VPS_SSH_KEY belum di-set"; exit 1; }
+          test -n "$DB_URL" || { echo "::error::Secret VPS_DATABASE_URL belum di-set"; exit 1; }
       - name: Build binary linux/amd64
         run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath -o server ./cmd/api
       - name: Copy binary ke VPS
