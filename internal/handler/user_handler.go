@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"example.com/my-api/internal/dto"
+	"example.com/my-api/internal/middleware"
 	"example.com/my-api/internal/repository"
 	"example.com/my-api/internal/service"
 	"example.com/my-api/pkg/validator"
@@ -19,6 +20,29 @@ type UserHandler struct {
 
 func NewUserHandler(service service.UserService) *UserHandler {
 	return &UserHandler{service: service}
+}
+
+func (h *UserHandler) GetUserInfo(c *gin.Context) {
+	userID := c.GetInt64(middleware.UserIDKey)
+
+	user, err := h.service.GetUserByID(c.Request.Context(), userID)
+	if err != nil {
+		if err == repository.ErrUserNotFound {
+			c.JSON(http.StatusNotFound, gin.H{
+				"message": "user tidak ditemukan",
+			})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "gagal ambil data user",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Data user berhasil diambil",
+		"data":    user,
+	})
 }
 
 func (h *UserHandler) CreateUser(c *gin.Context) {

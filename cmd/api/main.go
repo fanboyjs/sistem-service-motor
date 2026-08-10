@@ -38,7 +38,9 @@ func main() {
 	userRepository := repository.NewUserRepository(db)
 	userService := service.NewUserService(userRepository)
 	userHandler := handler.NewUserHandler(userService)
-	router := route.SetupRouter(userHandler)
+	authService := service.NewAuthService(userRepository, cfg)
+	authHandler := handler.NewAuthHandler(authService)
+	router := route.SetupRouter(userHandler, authHandler, cfg)
 
 	log.Println("Server running on port", cfg.AppPort)
 	if err := router.Run(":" + cfg.AppPort); err != nil {

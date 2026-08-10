@@ -5,17 +5,20 @@ import (
 	"errors"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"example.com/my-api/internal/model"
 )
 
 var ErrUserNotFound = errors.New("user tidak ditemukan")
+var ErrEmailExists = errors.New("email sudah terdaftar")
 
 type UserRepository interface {
 	Create(ctx context.Context, user model.User) (model.User, error)
 	FindAll(ctx context.Context) ([]model.User, error)
 	FindByID(ctx context.Context, id int64) (model.User, error)
+	FindByEmail(ctx context.Context, email string) (model.User, error)
 	Update(ctx context.Context, user model.User) (model.User, error)
 	Delete(ctx context.Context, id int64) error
 }
@@ -30,17 +33,21 @@ func NewUserRepository(db *pgxpool.Pool) UserRepository {
 
 func (r *userRepository) Create(ctx context.Context, user model.User) (model.User, error) {
 	err := r.db.QueryRow(ctx, `
-		INSERT INTO users (name, email)
-		VALUES ($1, $2)
-		RETURNING id, name, email, created_at, updated_at
-	`, user.Name, user.Email).Scan(
+		INSERT INTO users (name, email, password)
+		VALUES ($1, $2, $3)
+		RETURNING id, name, email, password, created_at, updated_at
+	`, user.Name, user.Email, user.Password).Scan(
 		&user.ID,
 		&user.Name,
 		&user.Email,
+		&user.Password,
 		&user.CreatedAt,
 		&user.UpdatedAt,
 	)
 	if err != nil {
+		if isUniqueViolation(err) {
+			return model.User{}, ErrEmailExists
+		}
 		return model.User{}, err
 	}
 	return user, nil
@@ -97,6 +104,29 @@ func (r *userRepository) FindByID(ctx context.Context, id int64) (model.User, er
 	return user, nil
 }
 
+func (r *userRepository) FindByEmail(ctx context.Context, email string) (model.User, error) {
+	var user model.User
+	err := r.db.QueryRow(ctx, `
+		SELECT id, name, email, password, created_at, updated_at
+		FROM users
+		WHERE email = $1
+	`, email).Scan(
+		&user.ID,
+		&user.Name,
+		&user.Email,
+		&user.Password,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return model.User{}, ErrUserNotFound
+	}
+	if err != nil {
+		return model.User{}, err
+	}
+	return user, nil
+}
+
 func (r *userRepository) Update(ctx context.Context, user model.User) (model.User, error) {
 	err := r.db.QueryRow(ctx, `
 		UPDATE users
@@ -131,4 +161,9 @@ func (r *userRepository) Delete(ctx context.Context, id int64) error {
 		return ErrUserNotFound
 	}
 	return nil
+}
+
+func isUniqueViolation(err error) bool {
+	var pgErr *pgconn.PgError
+	return errors.As(err, &pgErr) && pgErr.Code == "23505"
 }
