@@ -58,6 +58,25 @@ APP_ENV=testing go run ./cmd/api
 
 > Windows (cmd/PowerShell): `$env:APP_ENV="testing"; go run ./cmd/api`
 
+### Hot reload (Air)
+
+Untuk development, install [Air](https://github.com/air-verse/air) lalu jalankan:
+
+```bash
+go install github.com/air-verse/air@latest
+```
+
+```bash
+air                       # production (memakai .env)
+APP_ENV=testing air       # testing (memakai .env.testing)
+```
+
+> Windows (cmd/PowerShell): `$env:APP_ENV="testing"; air`
+>
+> Jika `air` tidak ditemukan, pastikan `$(go env GOPATH)/bin` ada di PATH.
+
+Air otomatis me-restart server saat file `.go` atau `.env` berubah. Konfigurasi di `.air.toml`.
+
 ### Migrasi per branch
 
 Jalankan migrasi dengan script `scripts/migrate.sh` (membaca `DATABASE_URL` dari file env yang sesuai):

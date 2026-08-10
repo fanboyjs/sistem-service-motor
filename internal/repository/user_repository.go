@@ -13,8 +13,10 @@ import (
 var ErrUserNotFound = errors.New("user tidak ditemukan")
 
 type UserRepository interface {
+	Create(ctx context.Context, user model.User) (model.User, error)
 	FindAll(ctx context.Context) ([]model.User, error)
 	FindByID(ctx context.Context, id int64) (model.User, error)
+	Update(ctx context.Context, user model.User) (model.User, error)
 	Delete(ctx context.Context, id int64) error
 }
 
@@ -24,6 +26,24 @@ type userRepository struct {
 
 func NewUserRepository(db *pgxpool.Pool) UserRepository {
 	return &userRepository{db: db}
+}
+
+func (r *userRepository) Create(ctx context.Context, user model.User) (model.User, error) {
+	err := r.db.QueryRow(ctx, `
+		INSERT INTO users (name, email)
+		VALUES ($1, $2)
+		RETURNING id, name, email, created_at, updated_at
+	`, user.Name, user.Email).Scan(
+		&user.ID,
+		&user.Name,
+		&user.Email,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	)
+	if err != nil {
+		return model.User{}, err
+	}
+	return user, nil
 }
 
 func (r *userRepository) FindAll(ctx context.Context) ([]model.User, error) {
@@ -62,6 +82,28 @@ func (r *userRepository) FindByID(ctx context.Context, id int64) (model.User, er
 		FROM users
 		WHERE id = $1
 	`, id).Scan(
+		&user.ID,
+		&user.Name,
+		&user.Email,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return model.User{}, ErrUserNotFound
+	}
+	if err != nil {
+		return model.User{}, err
+	}
+	return user, nil
+}
+
+func (r *userRepository) Update(ctx context.Context, user model.User) (model.User, error) {
+	err := r.db.QueryRow(ctx, `
+		UPDATE users
+		SET name = $1, email = $2, updated_at = CURRENT_TIMESTAMP
+		WHERE id = $3
+		RETURNING id, name, email, created_at, updated_at
+	`, user.Name, user.Email, user.ID).Scan(
 		&user.ID,
 		&user.Name,
 		&user.Email,
