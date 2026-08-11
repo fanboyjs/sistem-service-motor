@@ -1,0 +1,2 @@
+ALTER TABLE vehicle_brands ALTER COLUMN logo_url SET NOT NULL;
+ALTER TABLE vehicles ALTER COLUMN image_url SET NOT NULL;
