@@ -8,7 +8,7 @@ import (
 	"example.com/my-api/internal/middleware"
 )
 
-func SetupRouter(userHandler *handler.UserHandler, authHandler *handler.AuthHandler, vehicleBrandHandler *handler.VehicleBrandHandler, vehicleModelHandler *handler.VehicleModelHandler, cfg config.Config) *gin.Engine {
+func SetupRouter(userHandler *handler.UserHandler, authHandler *handler.AuthHandler, vehicleBrandHandler *handler.VehicleBrandHandler, vehicleModelHandler *handler.VehicleModelHandler, vehicleHandler *handler.VehicleHandler, cfg config.Config) *gin.Engine {
 	router := gin.Default()
 
 	router.Static("/uploads", cfg.UploadDir)
@@ -42,6 +42,14 @@ func SetupRouter(userHandler *handler.UserHandler, authHandler *handler.AuthHand
 		vehicleModels.GET("", vehicleModelHandler.GetVehicleModels)
 		vehicleModels.GET("/:id", vehicleModelHandler.GetVehicleModelById)
 		vehicleModels.PUT("/:id", vehicleModelHandler.UpdateVehicleModel)
+	}
+
+	vehicles := api.Group("/vehicles", middleware.Auth(cfg))
+	{
+		vehicles.POST("", vehicleHandler.CreateVehicle)
+		vehicles.GET("", vehicleHandler.GetVehicles)
+		vehicles.GET("/:id", vehicleHandler.GetVehicleByID)
+		vehicles.PUT("/:id", vehicleHandler.UpdateVehicle)
 	}
 
 	return router

@@ -6,7 +6,9 @@ type Vehicle struct {
 	ID                int64     `json:"id"`
 	UserID            int64     `json:"user_id"`
 	BrandID           int64     `json:"brand_id"`
+	BrandName         string    `json:"brand_name"`
 	ModelID           int64     `json:"model_id"`
+	ModelName         string    `json:"model_name"`
 	LicensePlate      string    `json:"license_plate"`
 	ManufacturingYear int       `json:"manufacturing_year"`
 	Color             *string   `json:"color"`
