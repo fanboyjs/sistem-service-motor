@@ -110,6 +110,6 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             cd /home/${{ secrets.VPS_USER }}/apps/sistem-service-motor
-            printf 'APP_ENV=production\nAPP_PORT=8080\nDATABASE_URL=%s\nJWT_SECRET=%s\nJWT_EXPIRY=24h\n' "${{ secrets.VPS_DATABASE_URL }}" "${{ secrets.JWT_SECRET }}" > .env
+            printf 'APP_ENV=production\nAPP_PORT=8080\nDATABASE_URL=%s\nJWT_SECRET=%s\nJWT_EXPIRY=24h\nUPLOAD_DIR=uploads\n' "${{ secrets.VPS_DATABASE_URL }}" "${{ secrets.JWT_SECRET }}" > .env
             chmod +x server
             sudo systemctl restart sistem-service-motor

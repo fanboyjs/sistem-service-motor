@@ -8,6 +8,7 @@ import (
 type Config struct {
 	AppPort string
 	AppEnv string
+	UploadDir string
 	DBURL string
 	DBHost string
 	DBPort string
@@ -24,6 +25,7 @@ func Load() Config {
 	return Config{
 		AppPort: getEnv("APP_PORT", "8080"),
 		AppEnv: getEnv("APP_ENV", "development"),
+		UploadDir: getEnv("UPLOAD_DIR", "uploads"),
 		DBURL: getEnv("DATABASE_URL", ""),
 		DBHost: getEnv("DB_HOST", "localhost"),
 		DBPort: getEnv("DB_PORT", "5432"),

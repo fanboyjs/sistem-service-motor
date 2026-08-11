@@ -12,6 +12,7 @@ import (
 	"example.com/my-api/internal/repository"
 	"example.com/my-api/internal/route"
 	"example.com/my-api/internal/service"
+	"example.com/my-api/internal/storage"
 )
 
 func main() {
@@ -40,7 +41,11 @@ func main() {
 	userHandler := handler.NewUserHandler(userService)
 	authService := service.NewAuthService(userRepository, cfg)
 	authHandler := handler.NewAuthHandler(authService)
-	router := route.SetupRouter(userHandler, authHandler, cfg)
+	vehicleBrandRepository := repository.NewVehicleBrandRepository(db)
+	vehicleBrandStorage := storage.NewLocalStorage(cfg.UploadDir)
+	vehicleBrandService := service.NewVehicleBrandService(vehicleBrandRepository, vehicleBrandStorage)
+	vehicleBrandHandler := handler.NewVehicleBrandHandler(vehicleBrandService)
+	router := route.SetupRouter(userHandler, authHandler, vehicleBrandHandler, cfg)
 
 	log.Println("Server running on port", cfg.AppPort)
 	if err := router.Run(":" + cfg.AppPort); err != nil {
