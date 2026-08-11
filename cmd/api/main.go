@@ -45,7 +45,10 @@ func main() {
 	vehicleBrandStorage := storage.NewLocalStorage(cfg.UploadDir)
 	vehicleBrandService := service.NewVehicleBrandService(vehicleBrandRepository, vehicleBrandStorage)
 	vehicleBrandHandler := handler.NewVehicleBrandHandler(vehicleBrandService)
-	router := route.SetupRouter(userHandler, authHandler, vehicleBrandHandler, cfg)
+	vehicleModelRepository := repository.NewVehicleModelRepository(db)
+	vehicleModelService := service.NewVehicleModelService(vehicleModelRepository)
+	vehicleModelHandler := handler.NewVehicleModelHandler(vehicleModelService)
+	router := route.SetupRouter(userHandler, authHandler, vehicleBrandHandler, vehicleModelHandler, cfg)
 
 	log.Println("Server running on port", cfg.AppPort)
 	if err := router.Run(":" + cfg.AppPort); err != nil {

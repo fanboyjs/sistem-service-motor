@@ -26,3 +26,11 @@ type VehicleBrand struct {
 	CreatedAt time.Time `json:"-"`
 	UpdatedAt time.Time `json:"-"`
 }
+
+type VehicleModel struct {
+	ID        int64     `json:"id"`
+	BrandID   int64     `json:"brand_id"`
+	Name      string    `json:"name"`
+	CreatedAt time.Time `json:"-"`
+	UpdatedAt time.Time `json:"-"`
+}
