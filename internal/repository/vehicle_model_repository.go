@@ -15,6 +15,10 @@ var ErrVehicleModelNotFound = errors.New("model kendaraan tidak ditemukan")
 var ErrModelNameExists = errors.New("nama model kendaraan sudah terdaftar")
 var ErrVehicleBrandNotFoundFK = errors.New("brand kendaraan tidak ditemukan")
 
+const vehicleModelSelectColumns = `
+	vm.id, vm.brand_id, b.name, vm.name,
+	vm.created_at, vm.updated_at`
+
 type VehicleModelRepository interface {
 	Create(ctx context.Context, modelData model.VehicleModel) (model.VehicleModel, error)
 	FindAll(ctx context.Context) ([]model.VehicleModel, error)
@@ -32,12 +36,18 @@ func NewVehicleModelRepository(db *pgxpool.Pool) VehicleModelRepository {
 
 func (r *vehicleModelRepository) Create(ctx context.Context, modelData model.VehicleModel) (model.VehicleModel, error) {
 	err := r.db.QueryRow(ctx, `
-		INSERT INTO vehicle_models (brand_id, name)
-		VALUES ($1, $2)
-		RETURNING id, brand_id, name, created_at, updated_at
+		WITH ins AS (
+			INSERT INTO vehicle_models (brand_id, name)
+			VALUES ($1, $2)
+			RETURNING id, brand_id, name, created_at, updated_at
+		)
+		SELECT `+vehicleModelSelectColumns+`
+		FROM ins vm
+		JOIN vehicle_brands b ON b.id = vm.brand_id
 	`, modelData.BrandID, modelData.Name).Scan(
 		&modelData.ID,
 		&modelData.BrandID,
+		&modelData.BrandName,
 		&modelData.Name,
 		&modelData.CreatedAt,
 		&modelData.UpdatedAt,
@@ -56,9 +66,10 @@ func (r *vehicleModelRepository) Create(ctx context.Context, modelData model.Veh
 
 func (r *vehicleModelRepository) FindAll(ctx context.Context) ([]model.VehicleModel, error) {
 	rows, err := r.db.Query(ctx, `
-		SELECT id, brand_id, name, created_at, updated_at
-		FROM vehicle_models
-		ORDER BY id DESC
+		SELECT `+vehicleModelSelectColumns+`
+		FROM vehicle_models vm
+		JOIN vehicle_brands b ON b.id = vm.brand_id
+		ORDER BY vm.id DESC
 	`)
 	if err != nil {
 		return nil, err
@@ -71,6 +82,7 @@ func (r *vehicleModelRepository) FindAll(ctx context.Context) ([]model.VehicleMo
 		if err := rows.Scan(
 			&modelData.ID,
 			&modelData.BrandID,
+			&modelData.BrandName,
 			&modelData.Name,
 			&modelData.CreatedAt,
 			&modelData.UpdatedAt,
@@ -86,12 +98,14 @@ func (r *vehicleModelRepository) FindAll(ctx context.Context) ([]model.VehicleMo
 func (r *vehicleModelRepository) FindByID(ctx context.Context, id int64) (model.VehicleModel, error) {
 	var modelData model.VehicleModel
 	err := r.db.QueryRow(ctx, `
-		SELECT id, brand_id, name, created_at, updated_at
-		FROM vehicle_models
-		WHERE id = $1
+		SELECT `+vehicleModelSelectColumns+`
+		FROM vehicle_models vm
+		JOIN vehicle_brands b ON b.id = vm.brand_id
+		WHERE vm.id = $1
 	`, id).Scan(
 		&modelData.ID,
 		&modelData.BrandID,
+		&modelData.BrandName,
 		&modelData.Name,
 		&modelData.CreatedAt,
 		&modelData.UpdatedAt,
@@ -107,13 +121,19 @@ func (r *vehicleModelRepository) FindByID(ctx context.Context, id int64) (model.
 
 func (r *vehicleModelRepository) Update(ctx context.Context, modelData model.VehicleModel) (model.VehicleModel, error) {
 	err := r.db.QueryRow(ctx, `
-		UPDATE vehicle_models
-		SET brand_id = $1, name = $2, updated_at = CURRENT_TIMESTAMP
-		WHERE id = $3
-		RETURNING id, brand_id, name, created_at, updated_at
+		WITH upd AS (
+			UPDATE vehicle_models
+			SET brand_id = $1, name = $2, updated_at = CURRENT_TIMESTAMP
+			WHERE id = $3
+			RETURNING id, brand_id, name, created_at, updated_at
+		)
+		SELECT `+vehicleModelSelectColumns+`
+		FROM upd vm
+		JOIN vehicle_brands b ON b.id = vm.brand_id
 	`, modelData.BrandID, modelData.Name, modelData.ID).Scan(
 		&modelData.ID,
 		&modelData.BrandID,
+		&modelData.BrandName,
 		&modelData.Name,
 		&modelData.CreatedAt,
 		&modelData.UpdatedAt,

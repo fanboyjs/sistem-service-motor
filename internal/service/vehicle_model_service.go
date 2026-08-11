@@ -33,9 +33,10 @@ func (s *vehicleModelService) CreateVehicleModel(ctx context.Context, req dto.Cr
 	}
 
 	return dto.VehicleModelResponse{
-		ID:      modelData.ID,
-		BrandID: modelData.BrandID,
-		Name:    modelData.Name,
+		ID:        modelData.ID,
+		BrandID:   modelData.BrandID,
+		BrandName: modelData.BrandName,
+		Name:      modelData.Name,
 	}, nil
 }
 
@@ -58,8 +59,9 @@ func (s *vehicleModelService) UpdateVehicleModel(ctx context.Context, id int64, 
 	}
 
 	return dto.VehicleModelResponse{
-		ID:      modelData.ID,
-		BrandID: modelData.BrandID,
-		Name:    modelData.Name,
+		ID:        modelData.ID,
+		BrandID:   modelData.BrandID,
+		BrandName: modelData.BrandName,
+		Name:      modelData.Name,
 	}, nil
 }

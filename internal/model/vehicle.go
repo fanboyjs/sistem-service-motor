@@ -32,6 +32,7 @@ type VehicleBrand struct {
 type VehicleModel struct {
 	ID        int64     `json:"id"`
 	BrandID   int64     `json:"brand_id"`
+	BrandName string    `json:"brand_name"`
 	Name      string    `json:"name"`
 	CreatedAt time.Time `json:"-"`
 	UpdatedAt time.Time `json:"-"`
