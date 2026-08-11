@@ -18,13 +18,14 @@ const vehicleSelectColumns = `
 	v.id, v.user_id, v.brand_id, b.name, v.model_id, m.name,
 	v.license_plate, v.manufacturing_year, v.color, v.purchase_date,
 	v.engine_number, v.current_mileage, v.status, v.image_url,
-	v.created_at, v.updated_at`
+	COALESCE(q.token, ''), v.created_at, v.updated_at`
 
 type VehicleRepository interface {
 	Create(ctx context.Context, vehicle model.Vehicle) (model.Vehicle, error)
 	FindAll(ctx context.Context, userID int64) ([]model.Vehicle, error)
 	FindByID(ctx context.Context, id int64, userID int64) (model.Vehicle, error)
 	Update(ctx context.Context, vehicle model.Vehicle) (model.Vehicle, error)
+	Delete(ctx context.Context, id int64, userID int64) error
 }
 
 type vehicleRepository struct {
@@ -46,6 +47,7 @@ func (r *vehicleRepository) Create(ctx context.Context, vehicle model.Vehicle) (
 		FROM ins v
 		JOIN vehicle_brands b ON b.id = v.brand_id
 		JOIN vehicle_models m ON m.id = v.model_id
+		LEFT JOIN vehicle_qr_codes q ON q.vehicle_id = v.id
 	`, vehicle.UserID, vehicle.BrandID, vehicle.ModelID, vehicle.LicensePlate, vehicle.ManufacturingYear, vehicle.Color, vehicle.PurchaseDate, vehicle.EngineNumber, vehicle.CurrentMileage, vehicle.Status, vehicle.ImageURL).Scan(
 		&vehicle.ID,
 		&vehicle.UserID,
@@ -61,6 +63,7 @@ func (r *vehicleRepository) Create(ctx context.Context, vehicle model.Vehicle) (
 		&vehicle.CurrentMileage,
 		&vehicle.Status,
 		&vehicle.ImageURL,
+		&vehicle.QRToken,
 		&vehicle.CreatedAt,
 		&vehicle.UpdatedAt,
 	)
@@ -79,6 +82,7 @@ func (r *vehicleRepository) FindAll(ctx context.Context, userID int64) ([]model.
 		FROM vehicles v
 		JOIN vehicle_brands b ON b.id = v.brand_id
 		JOIN vehicle_models m ON m.id = v.model_id
+		LEFT JOIN vehicle_qr_codes q ON q.vehicle_id = v.id
 		WHERE v.user_id = $1
 		ORDER BY v.id DESC
 	`, userID)
@@ -105,6 +109,7 @@ func (r *vehicleRepository) FindAll(ctx context.Context, userID int64) ([]model.
 			&vehicle.CurrentMileage,
 			&vehicle.Status,
 			&vehicle.ImageURL,
+			&vehicle.QRToken,
 			&vehicle.CreatedAt,
 			&vehicle.UpdatedAt,
 		); err != nil {
@@ -123,6 +128,7 @@ func (r *vehicleRepository) FindByID(ctx context.Context, id int64, userID int64
 		FROM vehicles v
 		JOIN vehicle_brands b ON b.id = v.brand_id
 		JOIN vehicle_models m ON m.id = v.model_id
+		LEFT JOIN vehicle_qr_codes q ON q.vehicle_id = v.id
 		WHERE v.id = $1 AND v.user_id = $2
 	`, id, userID).Scan(
 		&vehicle.ID,
@@ -139,6 +145,7 @@ func (r *vehicleRepository) FindByID(ctx context.Context, id int64, userID int64
 		&vehicle.CurrentMileage,
 		&vehicle.Status,
 		&vehicle.ImageURL,
+		&vehicle.QRToken,
 		&vehicle.CreatedAt,
 		&vehicle.UpdatedAt,
 	)
@@ -165,6 +172,7 @@ func (r *vehicleRepository) Update(ctx context.Context, vehicle model.Vehicle) (
 		FROM upd v
 		JOIN vehicle_brands b ON b.id = v.brand_id
 		JOIN vehicle_models m ON m.id = v.model_id
+		LEFT JOIN vehicle_qr_codes q ON q.vehicle_id = v.id
 	`, vehicle.BrandID, vehicle.ModelID, vehicle.LicensePlate, vehicle.ManufacturingYear, vehicle.Color, vehicle.PurchaseDate, vehicle.EngineNumber, vehicle.CurrentMileage, vehicle.Status, vehicle.ImageURL, vehicle.ID, vehicle.UserID).Scan(
 		&vehicle.ID,
 		&vehicle.UserID,
@@ -180,6 +188,7 @@ func (r *vehicleRepository) Update(ctx context.Context, vehicle model.Vehicle) (
 		&vehicle.CurrentMileage,
 		&vehicle.Status,
 		&vehicle.ImageURL,
+		&vehicle.QRToken,
 		&vehicle.CreatedAt,
 		&vehicle.UpdatedAt,
 	)
@@ -193,6 +202,20 @@ func (r *vehicleRepository) Update(ctx context.Context, vehicle model.Vehicle) (
 		return model.Vehicle{}, err
 	}
 	return vehicle, nil
+}
+
+func (r *vehicleRepository) Delete(ctx context.Context, id int64, userID int64) error {
+	tag, err := r.db.Exec(ctx, `
+		DELETE FROM vehicles
+		WHERE id = $1 AND user_id = $2
+	`, id, userID)
+	if err != nil {
+		return err
+	}
+	if tag.RowsAffected() == 0 {
+		return ErrVehicleNotFound
+	}
+	return nil
 }
 
 func vehicleForeignKeyError(err error) error {

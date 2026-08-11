@@ -50,9 +50,15 @@ func main() {
 	vehicleModelHandler := handler.NewVehicleModelHandler(vehicleModelService)
 	vehicleRepository := repository.NewVehicleRepository(db)
 	vehicleStorage := storage.NewLocalStorage(cfg.UploadDir)
-	vehicleService := service.NewVehicleService(vehicleRepository, vehicleStorage)
+	vehicleQRRepository := repository.NewVehicleQRRepository(db)
+	vehicleQRService := service.NewVehicleQRService(vehicleQRRepository, vehicleRepository, vehicleStorage, cfg)
+	vehicleService := service.NewVehicleService(vehicleRepository, vehicleStorage, vehicleQRService)
 	vehicleHandler := handler.NewVehicleHandler(vehicleService)
-	router := route.SetupRouter(userHandler, authHandler, vehicleBrandHandler, vehicleModelHandler, vehicleHandler, cfg)
+	vehicleQRHandler := handler.NewVehicleQRHandler(vehicleQRService)
+	vehicleTaxRepository := repository.NewVehicleTaxRepository(db)
+	vehicleTaxService := service.NewVehicleTaxService(vehicleTaxRepository)
+	vehicleTaxHandler := handler.NewVehicleTaxHandler(vehicleTaxService)
+	router := route.SetupRouter(userHandler, authHandler, vehicleBrandHandler, vehicleModelHandler, vehicleHandler, vehicleTaxHandler, vehicleQRHandler, cfg)
 
 	log.Println("Server running on port", cfg.AppPort)
 	if err := router.Run(":" + cfg.AppPort); err != nil {

@@ -8,7 +8,7 @@ import (
 	"example.com/my-api/internal/middleware"
 )
 
-func SetupRouter(userHandler *handler.UserHandler, authHandler *handler.AuthHandler, vehicleBrandHandler *handler.VehicleBrandHandler, vehicleModelHandler *handler.VehicleModelHandler, vehicleHandler *handler.VehicleHandler, cfg config.Config) *gin.Engine {
+func SetupRouter(userHandler *handler.UserHandler, authHandler *handler.AuthHandler, vehicleBrandHandler *handler.VehicleBrandHandler, vehicleModelHandler *handler.VehicleModelHandler, vehicleHandler *handler.VehicleHandler, vehicleTaxHandler *handler.VehicleTaxHandler, vehicleQRHandler *handler.VehicleQRHandler, cfg config.Config) *gin.Engine {
 	router := gin.Default()
 
 	router.Static("/uploads", cfg.UploadDir)
@@ -16,6 +16,7 @@ func SetupRouter(userHandler *handler.UserHandler, authHandler *handler.AuthHand
 	api := router.Group("/api")
 	api.POST("/login", authHandler.Login)
 	api.POST("/register", authHandler.Register)
+	api.GET("/qr/vehicle/:token", vehicleQRHandler.GetVehicleByQRToken)
 
 	api.GET("/user-info", middleware.Auth(cfg), userHandler.GetUserInfo)
 
@@ -50,6 +51,17 @@ func SetupRouter(userHandler *handler.UserHandler, authHandler *handler.AuthHand
 		vehicles.GET("", vehicleHandler.GetVehicles)
 		vehicles.GET("/:id", vehicleHandler.GetVehicleByID)
 		vehicles.PUT("/:id", vehicleHandler.UpdateVehicle)
+		vehicles.DELETE("/:id", vehicleHandler.DeleteVehicle)
+		vehicles.PUT("/:id/qr", vehicleQRHandler.RefreshVehicleQR)
+	}
+
+	vehicleTaxes := api.Group("/vehicle-taxes", middleware.Auth(cfg))
+	{
+		vehicleTaxes.POST("", vehicleTaxHandler.CreateVehicleTax)
+		vehicleTaxes.GET("", vehicleTaxHandler.GetVehicleTaxes)
+		vehicleTaxes.GET("/:id", vehicleTaxHandler.GetVehicleTaxById)
+		vehicleTaxes.PUT("/:id", vehicleTaxHandler.UpdateVehicleTax)
+		vehicleTaxes.DELETE("/:id", vehicleTaxHandler.DeleteVehicleTax)
 	}
 
 	return router

@@ -6,35 +6,37 @@ import (
 )
 
 type Config struct {
-	AppPort string
-	AppEnv string
-	UploadDir string
-	DBURL string
-	DBHost string
-	DBPort string
-	DBUser string
-	DBPassword string
-	DBName string
-	DBSSLMode string
-	JWTSecret string
-	JWTExpiry string
+	AppPort       string
+	AppEnv        string
+	UploadDir     string
+	PublicBaseURL string
+	DBURL         string
+	DBHost        string
+	DBPort        string
+	DBUser        string
+	DBPassword    string
+	DBName        string
+	DBSSLMode     string
+	JWTSecret     string
+	JWTExpiry     string
 }
 
 // load config dari env
 func Load() Config {
 	return Config{
-		AppPort: getEnv("APP_PORT", "8080"),
-		AppEnv: getEnv("APP_ENV", "development"),
-		UploadDir: getEnv("UPLOAD_DIR", "uploads"),
-		DBURL: getEnv("DATABASE_URL", ""),
-		DBHost: getEnv("DB_HOST", "localhost"),
-		DBPort: getEnv("DB_PORT", "5432"),
-		DBUser: getEnv("DB_USER", "postgres"),
-		DBPassword: getEnv("DB_PASSWORD", "postgres"),
-		DBName: getEnv("DB_NAME", "my_api"),
-		DBSSLMode: getEnv("DB_SSLMODE", "disable"),
-		JWTSecret: getEnv("JWT_SECRET", "secret"),
-		JWTExpiry: getEnv("JWT_EXPIRY", "24h"),
+		AppPort:       getEnv("APP_PORT", "8080"),
+		AppEnv:        getEnv("APP_ENV", "development"),
+		UploadDir:     getEnv("UPLOAD_DIR", "uploads"),
+		PublicBaseURL: getEnv("PUBLIC_BASE_URL", "http://localhost:8080"),
+		DBURL:         getEnv("DATABASE_URL", ""),
+		DBHost:        getEnv("DB_HOST", "localhost"),
+		DBPort:        getEnv("DB_PORT", "5432"),
+		DBUser:        getEnv("DB_USER", "postgres"),
+		DBPassword:    getEnv("DB_PASSWORD", "postgres"),
+		DBName:        getEnv("DB_NAME", "my_api"),
+		DBSSLMode:     getEnv("DB_SSLMODE", "disable"),
+		JWTSecret:     getEnv("JWT_SECRET", "secret"),
+		JWTExpiry:     getEnv("JWT_EXPIRY", "24h"),
 	}
 }
 

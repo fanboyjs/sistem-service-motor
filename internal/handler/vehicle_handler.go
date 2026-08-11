@@ -174,6 +174,35 @@ func (h *VehicleHandler) UpdateVehicle(c *gin.Context) {
 	})
 }
 
+func (h *VehicleHandler) DeleteVehicle(c *gin.Context) {
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "id tidak valid",
+		})
+		return
+	}
+
+	userID := c.GetInt64(middleware.UserIDKey)
+	err = h.service.DeleteVehicle(c.Request.Context(), id, userID)
+	if err != nil {
+		if err == repository.ErrVehicleNotFound {
+			c.JSON(http.StatusNotFound, gin.H{
+				"message": "kendaraan tidak ditemukan",
+			})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "gagal hapus data kendaraan",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": fmt.Sprintf("berhasil hapus data kendaraan, dengan id : %d", id),
+	})
+}
+
 func parseVehicleForm(c *gin.Context) (dto.CreateVehicleRequest, bool) {
 	c.Request.Body = http.MaxBytesReader(c.Writer, c.Request.Body, maxVehicleImageSize)
 	if err := c.Request.ParseMultipartForm(maxVehicleImageSize); err != nil {

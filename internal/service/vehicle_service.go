@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"io"
+	"strconv"
 	"strings"
 	"time"
 
@@ -18,15 +19,17 @@ type VehicleService interface {
 	GetVehicles(ctx context.Context, userID int64) ([]dto.VehicleResponse, error)
 	GetVehicleByID(ctx context.Context, id int64, userID int64) (dto.VehicleResponse, error)
 	UpdateVehicle(ctx context.Context, id int64, userID int64, req dto.UpdateVehicleRequest, image io.Reader, imageExt string) (dto.VehicleResponse, error)
+	DeleteVehicle(ctx context.Context, id int64, userID int64) error
 }
 
 type vehicleService struct {
 	repository repository.VehicleRepository
 	storage    storage.Storage
+	qrService  VehicleQRService
 }
 
-func NewVehicleService(repository repository.VehicleRepository, storage storage.Storage) VehicleService {
-	return &vehicleService{repository: repository, storage: storage}
+func NewVehicleService(repository repository.VehicleRepository, storage storage.Storage, qrService VehicleQRService) VehicleService {
+	return &vehicleService{repository: repository, storage: storage, qrService: qrService}
 }
 
 func (s *vehicleService) CreateVehicle(ctx context.Context, userID int64, req dto.CreateVehicleRequest, image io.Reader, imageExt string) (dto.VehicleResponse, error) {
@@ -59,6 +62,16 @@ func (s *vehicleService) CreateVehicle(ctx context.Context, userID int64, req dt
 		}
 		return dto.VehicleResponse{}, err
 	}
+
+	qr, qrErr := s.qrService.GenerateForVehicle(ctx, vehicle.ID)
+	if qrErr != nil {
+		_ = s.repository.Delete(ctx, vehicle.ID, userID)
+		if imageURL != nil {
+			_ = s.storage.Delete(ctx, *imageURL)
+		}
+		return dto.VehicleResponse{}, qrErr
+	}
+	vehicle.QRToken = qr.Token
 
 	return toVehicleResponse(vehicle), nil
 }
@@ -130,7 +143,34 @@ func (s *vehicleService) UpdateVehicle(ctx context.Context, id int64, userID int
 	return toVehicleResponse(vehicle), nil
 }
 
+func (s *vehicleService) DeleteVehicle(ctx context.Context, id int64, userID int64) error {
+	existing, err := s.repository.FindByID(ctx, id, userID)
+	if err != nil {
+		return err
+	}
+
+	if err := s.repository.Delete(ctx, id, userID); err != nil {
+		return err
+	}
+
+	if existing.ImageURL != nil {
+		_ = s.storage.Delete(ctx, *existing.ImageURL)
+	}
+
+	_ = s.qrService.CleanupForVehicle(ctx, id)
+
+	return nil
+}
+
 func toVehicleResponse(vehicle model.Vehicle) dto.VehicleResponse {
+	var qrImageURL *string
+	var qrToken *string
+	if vehicle.QRToken != "" {
+		imageURL := "/uploads/qr/" + strconv.FormatInt(vehicle.ID, 10) + ".png"
+		token := vehicle.QRToken
+		qrImageURL = &imageURL
+		qrToken = &token
+	}
 	return dto.VehicleResponse{
 		ID:                vehicle.ID,
 		UserID:            vehicle.UserID,
@@ -146,6 +186,8 @@ func toVehicleResponse(vehicle model.Vehicle) dto.VehicleResponse {
 		CurrentMileage:    vehicle.CurrentMileage,
 		Status:            vehicle.Status,
 		ImageURL:          vehicle.ImageURL,
+		QRImageURL:        qrImageURL,
+		QRToken:           qrToken,
 	}
 }
 
