@@ -8,7 +8,7 @@ import (
 	"example.com/my-api/internal/middleware"
 )
 
-func SetupRouter(userHandler *handler.UserHandler, authHandler *handler.AuthHandler, vehicleBrandHandler *handler.VehicleBrandHandler, vehicleModelHandler *handler.VehicleModelHandler, vehicleHandler *handler.VehicleHandler, vehicleTaxHandler *handler.VehicleTaxHandler, vehicleQRHandler *handler.VehicleQRHandler, serviceTypeHandler *handler.ServiceTypeHandler, cfg config.Config) *gin.Engine {
+func SetupRouter(userHandler *handler.UserHandler, authHandler *handler.AuthHandler, vehicleBrandHandler *handler.VehicleBrandHandler, vehicleModelHandler *handler.VehicleModelHandler, vehicleHandler *handler.VehicleHandler, vehicleTaxHandler *handler.VehicleTaxHandler, vehicleQRHandler *handler.VehicleQRHandler, serviceTypeHandler *handler.ServiceTypeHandler, serviceItemHandler *handler.ServiceItemHandler, serviceRecordHandler *handler.ServiceRecordHandler, cfg config.Config) *gin.Engine {
 	router := gin.Default()
 
 	router.Static("/uploads", cfg.UploadDir)
@@ -16,9 +16,9 @@ func SetupRouter(userHandler *handler.UserHandler, authHandler *handler.AuthHand
 	api := router.Group("/api")
 	api.POST("/login", authHandler.Login)
 	api.POST("/register", authHandler.Register)
-	
+
 	api.GET("/user-info", middleware.Auth(cfg), userHandler.GetUserInfo)
-	
+
 	users := api.Group("/users", middleware.Auth(cfg))
 	{
 		users.POST("", userHandler.CreateUser)
@@ -27,7 +27,7 @@ func SetupRouter(userHandler *handler.UserHandler, authHandler *handler.AuthHand
 		users.PUT("/:id", userHandler.UpdateUser)
 		users.DELETE("/:id", userHandler.DeleteUser)
 	}
-	
+
 	vehicleBrands := api.Group("/vehicle-brands", middleware.Auth(cfg))
 	{
 		vehicleBrands.POST("", vehicleBrandHandler.CreateVehicleBrand)
@@ -43,7 +43,7 @@ func SetupRouter(userHandler *handler.UserHandler, authHandler *handler.AuthHand
 		vehicleModels.GET("/:id", vehicleModelHandler.GetVehicleModelById)
 		vehicleModels.PUT("/:id", vehicleModelHandler.UpdateVehicleModel)
 	}
-	
+
 	vehicles := api.Group("/vehicles", middleware.Auth(cfg))
 	{
 		vehicles.POST("", vehicleHandler.CreateVehicle)
@@ -69,6 +69,23 @@ func SetupRouter(userHandler *handler.UserHandler, authHandler *handler.AuthHand
 		serviceTypes.GET("", serviceTypeHandler.GetServiceTypes)
 		serviceTypes.GET("/:id", serviceTypeHandler.GetServiceTypeById)
 		serviceTypes.PUT("/:id", serviceTypeHandler.UpdateServiceType)
+	}
+
+	serviceItems := api.Group("/service-items", middleware.Auth(cfg))
+	{
+		serviceItems.POST("", serviceItemHandler.CreateServiceItem)
+		serviceItems.GET("", serviceItemHandler.GetServiceItems)
+		serviceItems.GET("/:id", serviceItemHandler.GetServiceItemById)
+		serviceItems.PUT("/:id", serviceItemHandler.UpdateServiceItem)
+	}
+
+	serviceRecords := api.Group("/service-records", middleware.Auth(cfg))
+	{
+		serviceRecords.POST("", serviceRecordHandler.CreateServiceRecord)
+		serviceRecords.GET("", serviceRecordHandler.GetServiceRecords)
+		serviceRecords.GET("/:id", serviceRecordHandler.GetServiceRecordById)
+		serviceRecords.PUT("/:id", serviceRecordHandler.UpdateServiceRecord)
+		serviceRecords.DELETE("/:id", serviceRecordHandler.DeleteServiceRecord)
 	}
 
 	return router

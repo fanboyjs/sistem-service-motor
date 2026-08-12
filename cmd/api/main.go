@@ -61,7 +61,13 @@ func main() {
 	serviceTypeRepository := repository.NewServiceTypeRepository(db)
 	serviceTypeService := service.NewServiceTypeService(serviceTypeRepository)
 	serviceTypeHandler := handler.NewServiceTypeHandler(serviceTypeService)
-	router := route.SetupRouter(userHandler, authHandler, vehicleBrandHandler, vehicleModelHandler, vehicleHandler, vehicleTaxHandler, vehicleQRHandler, serviceTypeHandler, cfg)
+	serviceItemRepository := repository.NewServiceItemRepository(db)
+	serviceItemService := service.NewServiceItemService(serviceItemRepository)
+	serviceItemHandler := handler.NewServiceItemHandler(serviceItemService)
+	serviceRecordRepository := repository.NewServiceRecordRepository(db)
+	serviceRecordService := service.NewServiceRecordService(serviceRecordRepository)
+	serviceRecordHandler := handler.NewServiceRecordHandler(serviceRecordService)
+	router := route.SetupRouter(userHandler, authHandler, vehicleBrandHandler, vehicleModelHandler, vehicleHandler, vehicleTaxHandler, vehicleQRHandler, serviceTypeHandler, serviceItemHandler, serviceRecordHandler, cfg)
 
 	log.Println("Server running on port", cfg.AppPort)
 	if err := router.Run(":" + cfg.AppPort); err != nil {
