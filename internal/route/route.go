@@ -8,7 +8,7 @@ import (
 	"example.com/my-api/internal/middleware"
 )
 
-func SetupRouter(userHandler *handler.UserHandler, authHandler *handler.AuthHandler, vehicleBrandHandler *handler.VehicleBrandHandler, vehicleModelHandler *handler.VehicleModelHandler, vehicleHandler *handler.VehicleHandler, vehicleTaxHandler *handler.VehicleTaxHandler, vehicleQRHandler *handler.VehicleQRHandler, cfg config.Config) *gin.Engine {
+func SetupRouter(userHandler *handler.UserHandler, authHandler *handler.AuthHandler, vehicleBrandHandler *handler.VehicleBrandHandler, vehicleModelHandler *handler.VehicleModelHandler, vehicleHandler *handler.VehicleHandler, vehicleTaxHandler *handler.VehicleTaxHandler, vehicleQRHandler *handler.VehicleQRHandler, serviceTypeHandler *handler.ServiceTypeHandler, cfg config.Config) *gin.Engine {
 	router := gin.Default()
 
 	router.Static("/uploads", cfg.UploadDir)
@@ -61,6 +61,14 @@ func SetupRouter(userHandler *handler.UserHandler, authHandler *handler.AuthHand
 		vehicleTaxes.GET("/:id", vehicleTaxHandler.GetVehicleTaxById)
 		vehicleTaxes.PUT("/:id", vehicleTaxHandler.UpdateVehicleTax)
 		vehicleTaxes.DELETE("/:id", vehicleTaxHandler.DeleteVehicleTax)
+	}
+
+	serviceTypes := api.Group("/service-types", middleware.Auth(cfg))
+	{
+		serviceTypes.POST("", serviceTypeHandler.CreateServiceType)
+		serviceTypes.GET("", serviceTypeHandler.GetServiceTypes)
+		serviceTypes.GET("/:id", serviceTypeHandler.GetServiceTypeById)
+		serviceTypes.PUT("/:id", serviceTypeHandler.UpdateServiceType)
 	}
 
 	return router
