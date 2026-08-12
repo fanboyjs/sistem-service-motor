@@ -16,10 +16,9 @@ func SetupRouter(userHandler *handler.UserHandler, authHandler *handler.AuthHand
 	api := router.Group("/api")
 	api.POST("/login", authHandler.Login)
 	api.POST("/register", authHandler.Register)
-	api.GET("/qr/vehicle/:token", vehicleQRHandler.GetVehicleByQRToken)
-
+	
 	api.GET("/user-info", middleware.Auth(cfg), userHandler.GetUserInfo)
-
+	
 	users := api.Group("/users", middleware.Auth(cfg))
 	{
 		users.POST("", userHandler.CreateUser)
@@ -28,7 +27,7 @@ func SetupRouter(userHandler *handler.UserHandler, authHandler *handler.AuthHand
 		users.PUT("/:id", userHandler.UpdateUser)
 		users.DELETE("/:id", userHandler.DeleteUser)
 	}
-
+	
 	vehicleBrands := api.Group("/vehicle-brands", middleware.Auth(cfg))
 	{
 		vehicleBrands.POST("", vehicleBrandHandler.CreateVehicleBrand)
@@ -44,7 +43,7 @@ func SetupRouter(userHandler *handler.UserHandler, authHandler *handler.AuthHand
 		vehicleModels.GET("/:id", vehicleModelHandler.GetVehicleModelById)
 		vehicleModels.PUT("/:id", vehicleModelHandler.UpdateVehicleModel)
 	}
-
+	
 	vehicles := api.Group("/vehicles", middleware.Auth(cfg))
 	{
 		vehicles.POST("", vehicleHandler.CreateVehicle)
@@ -52,7 +51,7 @@ func SetupRouter(userHandler *handler.UserHandler, authHandler *handler.AuthHand
 		vehicles.GET("/:id", vehicleHandler.GetVehicleByID)
 		vehicles.PUT("/:id", vehicleHandler.UpdateVehicle)
 		vehicles.DELETE("/:id", vehicleHandler.DeleteVehicle)
-		vehicles.PUT("/:id/qr", vehicleQRHandler.RefreshVehicleQR)
+		vehicles.GET("/qr/:id", vehicleQRHandler.GetVehicleByQRCode) // qr code vehicle
 	}
 
 	vehicleTaxes := api.Group("/vehicle-taxes", middleware.Auth(cfg))

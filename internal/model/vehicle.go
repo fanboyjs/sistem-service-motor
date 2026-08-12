@@ -17,18 +17,8 @@ type Vehicle struct {
 	CurrentMileage    int       `json:"current_mileage"`
 	Status            string    `json:"status"`
 	ImageURL          *string   `json:"image_url"`
-	QRToken           string    `json:"-"`
 	CreatedAt         time.Time `json:"-"`
 	UpdatedAt         time.Time `json:"-"`
-}
-
-type VehicleQRCode struct {
-	ID        int64     `json:"id"`
-	VehicleID int64     `json:"vehicle_id"`
-	Token     string    `json:"token"`
-	Status    string    `json:"status"`
-	CreatedAt time.Time `json:"-"`
-	UpdatedAt time.Time `json:"-"`
 }
 
 type VehicleBrand struct {

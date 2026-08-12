@@ -15,6 +15,4 @@ type VehicleResponse struct {
 	CurrentMileage    int     `json:"current_mileage"`
 	Status            string  `json:"status"`
 	ImageURL          *string `json:"image_url"`
-	QRImageURL        *string `json:"qr_image_url"`
-	QRToken           *string `json:"qr_token"`
 }

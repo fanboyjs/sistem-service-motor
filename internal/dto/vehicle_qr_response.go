@@ -1,11 +1,5 @@
 package dto
 
-type VehicleQRResponse struct {
-	Token    string `json:"token"`
-	ImageURL string `json:"qr_image_url"`
-	ScanURL  string `json:"scan_url"`
-}
-
 type VehicleQRScanResponse struct {
 	ID                int64   `json:"id"`
 	BrandName         string  `json:"brand_name"`
