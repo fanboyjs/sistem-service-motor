@@ -28,15 +28,17 @@ func (s *userService) CreateUser(ctx context.Context, req dto.CreateUserRequest)
 	user, err := s.repository.Create(ctx, model.User{
 		Name:  req.Name,
 		Email: req.Email,
+		Phone: stringPtr(req.Phone),
 	})
 	if err != nil {
 		return dto.UserResponse{}, err
 	}
 
 	return dto.UserResponse{
-		ID:        user.ID,
-		Name:      user.Name,
-		Email:     user.Email,
+		ID:    user.ID,
+		Name:  user.Name,
+		Email: user.Email,
+		Phone: user.Phone,
 	}, nil
 }
 
@@ -53,6 +55,7 @@ func (s *userService) UpdateUser(ctx context.Context, id int64, req dto.UpdateUs
 		ID:    id,
 		Name:  req.Name,
 		Email: req.Email,
+		Phone: stringPtr(req.Phone),
 	})
 	if err != nil {
 		return dto.UserResponse{}, err
@@ -62,9 +65,17 @@ func (s *userService) UpdateUser(ctx context.Context, id int64, req dto.UpdateUs
 		ID:    user.ID,
 		Name:  user.Name,
 		Email: user.Email,
+		Phone: user.Phone,
 	}, nil
 }
 
 func (s *userService) DeleteUser(ctx context.Context, id int64) error {
 	return s.repository.Delete(ctx, id)
+}
+
+func stringPtr(s string) *string {
+	if s == "" {
+		return nil
+	}
+	return &s
 }

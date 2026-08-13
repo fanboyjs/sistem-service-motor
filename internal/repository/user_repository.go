@@ -33,13 +33,14 @@ func NewUserRepository(db *pgxpool.Pool) UserRepository {
 
 func (r *userRepository) Create(ctx context.Context, user model.User) (model.User, error) {
 	err := r.db.QueryRow(ctx, `
-		INSERT INTO users (name, email, password)
-		VALUES ($1, $2, $3)
-		RETURNING id, name, email, password, created_at, updated_at
-	`, user.Name, user.Email, user.Password).Scan(
+		INSERT INTO users (name, email, password, phone)
+		VALUES ($1, $2, $3, $4)
+		RETURNING id, name, email, phone, password, created_at, updated_at
+	`, user.Name, user.Email, user.Password, user.Phone).Scan(
 		&user.ID,
 		&user.Name,
 		&user.Email,
+		&user.Phone,
 		&user.Password,
 		&user.CreatedAt,
 		&user.UpdatedAt,
@@ -55,7 +56,7 @@ func (r *userRepository) Create(ctx context.Context, user model.User) (model.Use
 
 func (r *userRepository) FindAll(ctx context.Context) ([]model.User, error) {
 	rows, err := r.db.Query(ctx, `
-		SELECT id, name, email, created_at, updated_at
+		SELECT id, name, email, phone, created_at, updated_at
 		FROM users
 		ORDER BY id DESC
 	`)
@@ -71,6 +72,7 @@ func (r *userRepository) FindAll(ctx context.Context) ([]model.User, error) {
 			&user.ID,
 			&user.Name,
 			&user.Email,
+			&user.Phone,
 			&user.CreatedAt,
 			&user.UpdatedAt,
 		); err != nil {
@@ -85,13 +87,14 @@ func (r *userRepository) FindAll(ctx context.Context) ([]model.User, error) {
 func (r *userRepository) FindByID(ctx context.Context, id int64) (model.User, error) {
 	var user model.User
 	err := r.db.QueryRow(ctx, `
-		SELECT id, name, email, created_at, updated_at
+		SELECT id, name, email, phone, created_at, updated_at
 		FROM users
 		WHERE id = $1
 	`, id).Scan(
 		&user.ID,
 		&user.Name,
 		&user.Email,
+		&user.Phone,
 		&user.CreatedAt,
 		&user.UpdatedAt,
 	)
@@ -107,13 +110,14 @@ func (r *userRepository) FindByID(ctx context.Context, id int64) (model.User, er
 func (r *userRepository) FindByEmail(ctx context.Context, email string) (model.User, error) {
 	var user model.User
 	err := r.db.QueryRow(ctx, `
-		SELECT id, name, email, password, created_at, updated_at
+		SELECT id, name, email, phone, password, created_at, updated_at
 		FROM users
 		WHERE email = $1
 	`, email).Scan(
 		&user.ID,
 		&user.Name,
 		&user.Email,
+		&user.Phone,
 		&user.Password,
 		&user.CreatedAt,
 		&user.UpdatedAt,
@@ -130,13 +134,14 @@ func (r *userRepository) FindByEmail(ctx context.Context, email string) (model.U
 func (r *userRepository) Update(ctx context.Context, user model.User) (model.User, error) {
 	err := r.db.QueryRow(ctx, `
 		UPDATE users
-		SET name = $1, email = $2, updated_at = CURRENT_TIMESTAMP
-		WHERE id = $3
-		RETURNING id, name, email, created_at, updated_at
-	`, user.Name, user.Email, user.ID).Scan(
+		SET name = $1, email = $2, phone = $3, updated_at = CURRENT_TIMESTAMP
+		WHERE id = $4
+		RETURNING id, name, email, phone, created_at, updated_at
+	`, user.Name, user.Email, user.Phone, user.ID).Scan(
 		&user.ID,
 		&user.Name,
 		&user.Email,
+		&user.Phone,
 		&user.CreatedAt,
 		&user.UpdatedAt,
 	)
