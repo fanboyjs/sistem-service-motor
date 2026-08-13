@@ -65,7 +65,7 @@ func main() {
 	serviceItemService := service.NewServiceItemService(serviceItemRepository)
 	serviceItemHandler := handler.NewServiceItemHandler(serviceItemService)
 	serviceRecordRepository := repository.NewServiceRecordRepository(db)
-	serviceRecordService := service.NewServiceRecordService(serviceRecordRepository)
+	serviceRecordService := service.NewServiceRecordService(serviceRecordRepository, serviceItemRepository)
 	serviceRecordHandler := handler.NewServiceRecordHandler(serviceRecordService)
 	router := route.SetupRouter(userHandler, authHandler, vehicleBrandHandler, vehicleModelHandler, vehicleHandler, vehicleTaxHandler, vehicleQRHandler, serviceTypeHandler, serviceItemHandler, serviceRecordHandler, cfg)
 

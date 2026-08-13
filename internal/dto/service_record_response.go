@@ -7,9 +7,10 @@ type ServiceRecordResponse struct {
 	ServiceTypeID   int64   `json:"service_type_id"`
 	ServiceTypeName string  `json:"service_type_name"`
 	ServiceDate     string  `json:"service_date"`
-	Odometer        float64 `json:"odometer"`
-	WorkshopName    string  `json:"workshop_name"`
-	LaborCost       float64 `json:"labor_cost"`
+	Odometer        float64               `json:"odometer"`
+	WorkshopName    string                `json:"workshop_name"`
+	ServiceItems    []ServiceItemResponse `json:"service_items,omitempty"`
+	LaborCost       float64               `json:"labor_cost"`
 	PartsCost       float64 `json:"parts_cost"`
 	TotalCost       float64 `json:"total_cost"`
 	Notes           string  `json:"notes"`

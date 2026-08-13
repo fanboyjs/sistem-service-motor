@@ -20,6 +20,7 @@ type ServiceItemRepository interface {
 	Create(ctx context.Context, serviceItem model.ServiceItem) (model.ServiceItem, error)
 	FindAll(ctx context.Context) ([]model.ServiceItem, error)
 	FindByID(ctx context.Context, id int64) (model.ServiceItem, error)
+	FindByServiceRecordIDs(ctx context.Context, recordIDs []int64) ([]model.ServiceItem, error)
 	Update(ctx context.Context, serviceItem model.ServiceItem) (model.ServiceItem, error)
 }
 
@@ -110,6 +111,39 @@ func (r *serviceItemRepository) FindByID(ctx context.Context, id int64) (model.S
 		return model.ServiceItem{}, err
 	}
 	return serviceItem, nil
+}
+
+func (r *serviceItemRepository) FindByServiceRecordIDs(ctx context.Context, recordIDs []int64) ([]model.ServiceItem, error) {
+	rows, err := r.db.Query(ctx, `
+		SELECT `+serviceItemSelectColumns+`
+		FROM service_items
+		WHERE service_record_id = ANY($1::bigint[])
+		ORDER BY id ASC
+	`, recordIDs)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	serviceItems := make([]model.ServiceItem, 0)
+	for rows.Next() {
+		var serviceItem model.ServiceItem
+		if err := rows.Scan(
+			&serviceItem.ID,
+			&serviceItem.ServiceRecordID,
+			&serviceItem.Name,
+			&serviceItem.Quantity,
+			&serviceItem.Cost,
+			&serviceItem.Notes,
+			&serviceItem.CreatedAt,
+			&serviceItem.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		serviceItems = append(serviceItems, serviceItem)
+	}
+
+	return serviceItems, rows.Err()
 }
 
 func (r *serviceItemRepository) Update(ctx context.Context, serviceItem model.ServiceItem) (model.ServiceItem, error) {
