@@ -1,0 +1,17 @@
+ALTER TABLE vehicles
+    ADD COLUMN plate_number VARCHAR(30),
+    ADD COLUMN brand VARCHAR(50),
+    ADD COLUMN model VARCHAR(50),
+    ADD COLUMN production_year VARCHAR(50),
+    ADD COLUMN chassis_number VARCHAR(50),
+    DROP COLUMN brand_id,
+    DROP COLUMN model_id,
+    DROP COLUMN license_plate,
+    DROP COLUMN manufacturing_year,
+    DROP COLUMN color,
+    DROP COLUMN purchase_date,
+    DROP COLUMN image_url,
+    ALTER COLUMN engine_number TYPE VARCHAR(50),
+    ALTER COLUMN current_mileage DROP DEFAULT,
+    ALTER COLUMN status DROP DEFAULT,
+    ALTER COLUMN status TYPE VARCHAR(50);

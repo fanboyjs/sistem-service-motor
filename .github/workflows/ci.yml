@@ -73,8 +73,9 @@ jobs:
           VPS_USER: ${{ secrets.VPS_USER }}
           VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
           VPS_DATABASE_URL: ${{ secrets.VPS_DATABASE_URL }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
         run: |
-          if [ -n "$VPS_HOST" ] && [ -n "$VPS_USER" ] && [ -n "$VPS_SSH_KEY" ] && [ -n "$VPS_DATABASE_URL" ]; then
+          if [ -n "$VPS_HOST" ] && [ -n "$VPS_USER" ] && [ -n "$VPS_SSH_KEY" ] && [ -n "$VPS_DATABASE_URL" ] && [ -n "$JWT_SECRET" ]; then
             echo "ready=true" >> "$GITHUB_OUTPUT"
             echo "VPS terkonfigurasi, deploy akan dijalankan."
           else
@@ -109,6 +110,6 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             cd /home/${{ secrets.VPS_USER }}/apps/sistem-service-motor
-            printf 'APP_ENV=production\nAPP_PORT=8080\nDATABASE_URL=%s\n' "${{ secrets.VPS_DATABASE_URL }}" > .env
+            printf 'APP_ENV=production\nAPP_PORT=8080\nDATABASE_URL=%s\nJWT_SECRET=%s\nJWT_EXPIRY=24h\nUPLOAD_DIR=uploads\n' "${{ secrets.VPS_DATABASE_URL }}" "${{ secrets.JWT_SECRET }}" > .env
             chmod +x server
             sudo systemctl restart sistem-service-motor

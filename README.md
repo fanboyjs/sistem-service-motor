@@ -37,6 +37,10 @@ cp .env.example .env
 
 2. Isi `DATABASE_URL` di `.env` dengan connection string Neon branch production (lihat tabel di atas).
 
+3. Isi `JWT_SECRET` di `.env` dengan random string kuat (contoh: `openssl rand -hex 32`).
+
+> **Penting:** jika `JWT_SECRET` tidak diisi, kode jatuh ke default `secret` yang **tidak aman untuk production** — siapapun bisa memalsukan token JWT. Set `JWT_SECRET` wajib dilakukan di `.env` lokal dan di `.env` VPS (lewat secret GitHub `JWT_SECRET`, lihat tabel secrets). Nilai yang sama dipakai untuk memverifikasi token.
+
 3. Jalankan migrasi (pakai direct URL):
 
 ```bash
@@ -57,6 +61,25 @@ APP_ENV=testing go run ./cmd/api
 ```
 
 > Windows (cmd/PowerShell): `$env:APP_ENV="testing"; go run ./cmd/api`
+
+### Hot reload (Air)
+
+Untuk development, install [Air](https://github.com/air-verse/air) lalu jalankan:
+
+```bash
+go install github.com/air-verse/air@latest
+```
+
+```bash
+air                       # production (memakai .env)
+APP_ENV=testing air       # testing (memakai .env.testing)
+```
+
+> Windows (cmd/PowerShell): `$env:APP_ENV="testing"; air`
+>
+> Jika `air` tidak ditemukan, pastikan `$(go env GOPATH)/bin` ada di PATH.
+
+Air otomatis me-restart server saat file `.go` atau `.env` berubah. Konfigurasi di `.air.toml`.
 
 ### Migrasi per branch
 
@@ -106,10 +129,11 @@ Di **Settings → Secrets and variables → Actions** — **wajib dibuat**, tanp
 | `VPS_USER`             | User deploy di VPS (**wajib untuk deploy**)      |
 | `VPS_SSH_KEY`          | Private key SSH (**wajib untuk deploy**)         |
 | `VPS_DATABASE_URL`     | Direct URL production (**wajib untuk deploy**)   |
+| `JWT_SECRET`           | Random string kuat untuk memverifikasi token JWT (**wajib untuk deploy**) |
 
 > Migrasi di CI memakai binary [golang-migrate v4.19.1](https://github.com/golang-migrate/migrate/releases) yang diunduh di runner, bukan container Docker.
 
-> **Deploy VPS otomatis di-skip** sampai keempat secret VPS di-set. Begitu VPS siap dan secret dibuat, job `deploy` langsung aktif tanpa ubah kode.
+> **Deploy VPS otomatis di-skip** sampai kelima secret VPS di-set (`VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY`, `VPS_DATABASE_URL`, `JWT_SECRET`). Begitu VPS siap dan secret dibuat, job `deploy` langsung aktif tanpa ubah kode.
 
 ## Deploy ke VPS (cth:Rumahweb)
 
@@ -178,4 +202,6 @@ migrate -path migrations -database "postgres://postgres:root@localhost:5432/sist
 
 API:
 
-`GET /api/users`
+- `POST /api/register` — body `{ "name", "email", "password" }` → `{ "message", "data": { "token", "email" } }`
+- `POST /api/login` — body `{ "email", "password" }` → `{ "message", "data": { "token" } }`
+- `GET /api/user-info`

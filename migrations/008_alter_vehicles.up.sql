@@ -1,0 +1,17 @@
+ALTER TABLE vehicles
+    DROP COLUMN plate_number,
+    DROP COLUMN brand,
+    DROP COLUMN model,
+    DROP COLUMN production_year,
+    DROP COLUMN chassis_number,
+    ADD COLUMN brand_id BIGINT NOT NULL REFERENCES vehicle_brands(id) ON DELETE CASCADE,
+    ADD COLUMN model_id BIGINT NOT NULL REFERENCES vehicle_models(id) ON DELETE CASCADE,
+    ADD COLUMN license_plate VARCHAR(30) NOT NULL,
+    ADD COLUMN manufacturing_year INTEGER NOT NULL,
+    ADD COLUMN color VARCHAR(50),
+    ADD COLUMN purchase_date DATE NOT NULL,
+    ADD COLUMN image_url VARCHAR(500),
+    ALTER COLUMN engine_number TYPE VARCHAR(30),
+    ALTER COLUMN current_mileage SET DEFAULT 0,
+    ALTER COLUMN status TYPE VARCHAR(30),
+    ALTER COLUMN status SET DEFAULT 'active';
