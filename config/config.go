@@ -24,7 +24,7 @@ type Config struct {
 // load config dari env
 func Load() Config {
 	return Config{
-		AppPort:       getEnv("APP_PORT", "8080"),
+		AppPort:       getEnv("PORT", getEnv("APP_PORT", "8080")),
 		AppEnv:        getEnv("APP_ENV", "development"),
 		UploadDir:     getEnv("UPLOAD_DIR", "uploads"),
 		PublicBaseURL: getEnv("PUBLIC_BASE_URL", "http://localhost:8080"),
