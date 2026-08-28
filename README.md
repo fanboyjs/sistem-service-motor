@@ -39,7 +39,7 @@ cp .env.example .env
 
 3. Isi `JWT_SECRET` di `.env` dengan random string kuat (contoh: `openssl rand -hex 32`).
 
-> **Penting:** jika `JWT_SECRET` tidak diisi, kode jatuh ke default `secret` yang **tidak aman untuk production** — siapapun bisa memalsukan token JWT. Set `JWT_SECRET` wajib dilakukan di `.env` lokal dan sebagai GitHub secret `JWT_SECRET` (yang otomatis disinkronkan ke Koyeb Secret, lihat tabel secrets). Nilai yang sama dipakai untuk memverifikasi token.
+> **Penting:** jika `JWT_SECRET` tidak diisi, kode jatuh ke default `secret` yang **tidak aman untuk production** — siapapun bisa memalsukan token JWT. Set `JWT_SECRET` wajib dilakukan di `.env` lokal dan sebagai GitHub secret `JWT_SECRET` (yang diset sebagai variabel secret di Railway, lihat tabel secrets). Nilai yang sama dipakai untuk memverifikasi token.
 
 3. Jalankan migrasi (pakai direct URL):
 
@@ -105,14 +105,14 @@ Alur otomatis di `.github/workflows/ci.yml` — cabang GitHub memetakan branch N
 | ------------------------------ | ------------------------------------------------ |
 | PR ke `main` / `test`          | Test (vet + build)                               |
 | Push ke branch `test`          | Test + migrasi ke branch **testing** Neon        |
-| Push ke branch `main`          | Test + migrasi branch **production** + deploy Koyeb |
+| Push ke branch `main`          | Test + migrasi branch **production** + deploy Railway |
 
 Alur kerja harian:
 
 ```text
 fitur → push ke test          → CI migrasi Neon testing, tes manual dari laptop
       → PR test → main        → job test jalan
-      → merge ke main         → CI migrasi Neon production + deploy Koyeb
+      → merge ke main         → CI migrasi Neon production + deploy Railway
 ```
 
 App testing tetap dijalankan manual dari local (`APP_ENV=testing go run ./cmd/api`).
@@ -125,33 +125,51 @@ Di **Settings → Secrets and variables → Actions** — **wajib dibuat**, tanp
 | ---------------------- | ------------------------------------------------ |
 | `NEON_TESTING_URL`     | Direct URL branch testing                        |
 | `NEON_PRODUCTION_URL`  | Direct URL branch production                     |
-| `KOYEB_API_TOKEN`      | Personal Access Token Koyeb (**wajib untuk deploy**) |
+| `RAILWAY_TOKEN`        | Public API token Railway (**wajib untuk deploy**) |
 | `JWT_SECRET`           | Random string kuat untuk memverifikasi token JWT (**wajib untuk deploy**) |
 
 > Migrasi di CI memakai binary [golang-migrate v4.19.1](https://github.com/golang-migrate/migrate/releases) yang diunduh di runner, bukan container Docker.
 
-## Deploy ke Koyeb
+## Deploy ke Railway
 
-Deploy otomatis ke [Koyeb](https://www.koyeb.com) saat **merge ke branch `main`**. Job `deploy-koyeb` membangun image dari `Dockerfile` (builder `docker`) lalu membuat/memperbarui App & Service **sistem-service-motor** dengan env var dari Koyeb Secrets.
+Deploy otomatis ke [Railway](https://railway.app) saat **merge ke branch `main`**. Job `deploy-railway` menjalankan Railway CLI (`railway up --service=api`) dari CI, membangun image dari `Dockerfile` (sesuai `railway.json`) lalu men-deploy ke service **api** pada project Railway yang sudah ter-link. Config build & healthcheck ada di `railway.json`.
 
-> **Catatan storage:** filesystem Koyeb bersifat **ephemeral** — file upload (`uploads/`) hilang saat redeploy/restart. Gunakan object storage (S3/R2) jika butuh file persisten.
+> **Catatan storage:** filesystem Railway bersifat **ephemeral** — file upload (`uploads/`) hilang saat redeploy/restart. Gunakan object storage (S3/R2) jika butuh file persisten.
 
 ### Setup satu kali (manual)
 
-1. **Buat Personal Access Token Koyeb** (Dashboard Koyeb → Account → API/Token). Simpan sebagai GitHub secret `KOYEB_API_TOKEN`.
+1. **Buat Project di Railway** — tidak perlu menambahkan plugin Postgres karena database tetap pakai Neon.
 
-2. Pastikan GitHub secret berikut sudah dibuat:
+2. **Tambahkan service dari GitHub repo** `fandipratamaa/sistem-service-motor` dengan builder **Dockerfile** (nama service: `api`).
+
+3. **Link project Railway dari lokal** agar `railway up` tahu target-nya:
+   ```bash
+   railway link
+   ```
+   (pilih project & service yang sudah dibuat di atas).
+
+4. **Set env var di service `api`** pada dashboard Railway:
+   - `APP_ENV=production`
+   - `APP_PORT=8080`
+   - `JWT_EXPIRY=24h`
+   - `UPLOAD_DIR=uploads`
+   - `PUBLIC_BASE_URL` = Public URL Railway (set setelah deploy pertama)
+   - `DATABASE_URL` = `NEON_PRODUCTION_URL` (variabel secret)
+   - `JWT_SECRET` = random string kuat (variabel secret)
+   - `PORT` otomatis disuntikkan Railway.
+
+5. **Buat Public API token Railway** (Dashboard → Account → Tokens). Simpan sebagai GitHub secret `RAILWAY_TOKEN`.
+
+6. Pastikan GitHub secret berikut sudah dibuat:
    - `NEON_PRODUCTION_URL` — Direct URL branch production Neon
    - `JWT_SECRET` — random string kuat (sama dengan yang dipakai lokal)
+   - `RAILWAY_TOKEN` — public API token Railway
 
-3. Jalankan sekali job `deploy-koyeb` (mis. push dummy ke `main`). Koyeb akan otomatis:
-   - Membuat Koyeb Secrets `DATABASE_URL` (dari `NEON_PRODUCTION_URL`) dan `JWT_SECRET`.
-   - Membuat App `sistem-service-motor` + Service `api` yang membangun image dari Dockerfile, mengekspos port `8080`, dan route `/`.
+7. Jalankan sekali job `deploy-railway` (mis. push dummy ke `main`). Railway akan membangun image dari Dockerfile dan deploy service `api`.
 
-4. Setelah deploy pertama berhasil, ambil **Public URL** untuk diisi sebagai env/QR code publik:
-   - `PUBLIC_BASE_URL` (optional) di env service = Public URL Koyeb (mis. `https://sistem-service-motor-<org>.koyeb.app`).
+8. Setelah deploy pertama berhasil, ambil **Public URL** Railway dan isi `PUBLIC_BASE_URL` di env service.
 
-App tersedia di Public URL yang diberikan Koyeb (domain `.koyeb.app`). Untuk domain custom, buka App → Settings → Domains di dashboard Koyeb.
+App tersedia di Public URL yang diberikan Railway (domain `*.up.railway.app`). Untuk domain custom, buka Project → Service → Settings → Domains di dashboard Railway.
 
 ## PostgreSQL lokal (opsional)
 

@@ -59,43 +59,22 @@ jobs:
           NEON_URL: ${{ secrets.NEON_PRODUCTION_URL }}
         run: migrate -path migrations -database "$NEON_URL" -verbose up
 
-  deploy-koyeb:
+  deploy-railway:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: [test, migrate-production]
     runs-on: ubuntu-latest
     concurrency:
-      group: koyeb-deploy
+      group: railway-deploy
       cancel-in-progress: false
+    container: ghcr.io/railwayapp/cli:latest
     steps:
       - uses: actions/checkout@v4
-      - name: Validasi secret KOYEB_API_TOKEN
+      - name: Validasi secret RAILWAY_TOKEN
         env:
-          KOYEB_TOKEN: ${{ secrets.KOYEB_API_TOKEN }}
+          TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         run: |
-          test -n "$KOYEB_TOKEN" || { echo "::error::Secret KOYEB_API_TOKEN belum di-set di Settings > Secrets > Actions"; exit 1; }
-      - name: Install dan konfigurasi Koyeb CLI
-        uses: koyeb-community/koyeb-actions@v2
-        with:
-          api_token: "${{ secrets.KOYEB_API_TOKEN }}"
-      - name: Buat secret DATABASE_URL di Koyeb
-        uses: koyeb/action-git-deploy/secret@v1
-        with:
-          secret-name: DATABASE_URL
-          secret-value: "${{ secrets.NEON_PRODUCTION_URL }}"
-      - name: Buat secret JWT_SECRET di Koyeb
-        uses: koyeb/action-git-deploy/secret@v1
-        with:
-          secret-name: JWT_SECRET
-          secret-value: "${{ secrets.JWT_SECRET }}"
-      - name: Build dan deploy ke Koyeb
-        uses: koyeb/action-git-deploy@v1
-        with:
-          git-url: github.com/fandipratamaa/sistem-service-motor
-          git-branch: main
-          git-builder: docker
-          app-name: sistem-service-motor
-          service-name: api
-          service-env: APP_ENV=production,APP_PORT=8080,APP_EXPOSE_PORT=8080,JWT_EXPIRY=24h,UPLOAD_DIR=uploads,DATABASE_URL=@DATABASE_URL,JWT_SECRET=@JWT_SECRET
-          service-ports: "8080:http"
-          service-routes: "/:8080"
-          service-checks: "8080:http:/"
+          test -n "$TOKEN" || { echo "::error::Secret RAILWAY_TOKEN belum di-set di Settings > Secrets > Actions"; exit 1; }
+      - name: Build dan deploy ke Railway
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: railway up --service=api --detach
