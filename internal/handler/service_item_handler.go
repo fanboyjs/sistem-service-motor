@@ -21,6 +21,19 @@ func NewServiceItemHandler(service service.ServiceItemService) *ServiceItemHandl
 	return &ServiceItemHandler{service: service}
 }
 
+// CreateServiceItem godoc
+// @Summary Buat item servis
+// @Description Membuat data item servis baru
+// @Tags Service Item
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body dto.CreateServiceItemRequest true "Data item servis"
+// @Success 201 {object} map[string]interface{} "Data item servis berhasil dibuat"
+// @Failure 400 {object} map[string]interface{} "request body tidak valid"
+// @Failure 401 {object} map[string]interface{} "token tidak valid"
+// @Failure 404 {object} map[string]interface{} "record servis tidak ditemukan"
+// @Router /service-items [post]
 func (h *ServiceItemHandler) CreateServiceItem(c *gin.Context) {
 	var req dto.CreateServiceItemRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -57,6 +70,16 @@ func (h *ServiceItemHandler) CreateServiceItem(c *gin.Context) {
 	})
 }
 
+// GetServiceItems godoc
+// @Summary Ambil semua item servis
+// @Description Mengambil daftar semua item servis
+// @Tags Service Item
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} map[string]interface{} "Data item servis berhasil diambil"
+// @Failure 401 {object} map[string]interface{} "token tidak valid"
+// @Router /service-items [get]
 func (h *ServiceItemHandler) GetServiceItems(c *gin.Context) {
 	serviceItems, err := h.service.GetServiceItems(c.Request.Context())
 	if err != nil {
@@ -72,6 +95,19 @@ func (h *ServiceItemHandler) GetServiceItems(c *gin.Context) {
 	})
 }
 
+// GetServiceItemById godoc
+// @Summary Ambil item servis berdasarkan ID
+// @Description Mengambil data item servis berdasarkan ID
+// @Tags Service Item
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID item servis"
+// @Success 200 {object} map[string]interface{} "Data item servis berhasil diambil"
+// @Failure 400 {object} map[string]interface{} "id tidak valid"
+// @Failure 401 {object} map[string]interface{} "token tidak valid"
+// @Failure 404 {object} map[string]interface{} "item servis tidak ditemukan"
+// @Router /service-items/{id} [get]
 func (h *ServiceItemHandler) GetServiceItemById(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
@@ -101,6 +137,20 @@ func (h *ServiceItemHandler) GetServiceItemById(c *gin.Context) {
 	})
 }
 
+// UpdateServiceItem godoc
+// @Summary Update item servis
+// @Description Memperbarui data item servis berdasarkan ID
+// @Tags Service Item
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID item servis"
+// @Param request body dto.UpdateServiceItemRequest true "Data item servis"
+// @Success 200 {object} map[string]interface{} "Data item servis berhasil diupdate"
+// @Failure 400 {object} map[string]interface{} "request body tidak valid"
+// @Failure 401 {object} map[string]interface{} "token tidak valid"
+// @Failure 404 {object} map[string]interface{} "item servis tidak ditemukan"
+// @Router /service-items/{id} [put]
 func (h *ServiceItemHandler) UpdateServiceItem(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {

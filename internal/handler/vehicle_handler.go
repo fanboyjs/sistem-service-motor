@@ -34,6 +34,28 @@ func NewVehicleHandler(service service.VehicleService) *VehicleHandler {
 	return &VehicleHandler{service: service}
 }
 
+// CreateVehicle godoc
+// @Summary Buat kendaraan
+// @Description Membuat data kendaraan baru milik user yang login (multipart/form-data)
+// @Tags Vehicles
+// @Accept multipart/form-data
+// @Produce json
+// @Security BearerAuth
+// @Param brand_id formData int true "ID brand"
+// @Param model_id formData int true "ID model"
+// @Param license_plate formData string true "Nomor plat"
+// @Param manufacturing_year formData int true "Tahun pembuatan"
+// @Param color formData string false "Warna"
+// @Param purchase_date formData string true "Tanggal pembelian (YYYY-MM-DD)"
+// @Param engine_number formData string true "Nomor mesin"
+// @Param current_mileage formData int true "Kilometer saat ini"
+// @Param status formData string false "Status (active/inactive)"
+// @Param image_url formData file false "Foto kendaraan (png, jpg, jpeg, webp, max 5MB)"
+// @Success 201 {object} map[string]interface{} "Data kendaraan berhasil dibuat"
+// @Failure 400 {object} map[string]interface{} "request body tidak valid"
+// @Failure 401 {object} map[string]interface{} "token tidak valid"
+// @Failure 413 {object} map[string]interface{} "ukuran file melebihi batas"
+// @Router /vehicles [post]
 func (h *VehicleHandler) CreateVehicle(c *gin.Context) {
 	req, ok := parseVehicleForm(c)
 	if !ok {
@@ -81,6 +103,16 @@ func (h *VehicleHandler) CreateVehicle(c *gin.Context) {
 	})
 }
 
+// GetVehicles godoc
+// @Summary Ambil semua kendaraan user
+// @Description Mengambil daftar kendaraan milik user yang login
+// @Tags Vehicles
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} map[string]interface{} "Data kendaraan berhasil diambil"
+// @Failure 401 {object} map[string]interface{} "token tidak valid"
+// @Router /vehicles [get]
 func (h *VehicleHandler) GetVehicles(c *gin.Context) {
 	userID := c.GetInt64(middleware.UserIDKey)
 	vehicles, err := h.service.GetVehicles(c.Request.Context(), userID)
@@ -97,6 +129,19 @@ func (h *VehicleHandler) GetVehicles(c *gin.Context) {
 	})
 }
 
+// GetVehicleByID godoc
+// @Summary Ambil kendaraan berdasarkan ID
+// @Description Mengambil data kendaraan milik user yang login berdasarkan ID
+// @Tags Vehicles
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID kendaraan"
+// @Success 200 {object} map[string]interface{} "Data kendaraan berhasil diambil"
+// @Failure 400 {object} map[string]interface{} "id tidak valid"
+// @Failure 401 {object} map[string]interface{} "token tidak valid"
+// @Failure 404 {object} map[string]interface{} "kendaraan tidak ditemukan"
+// @Router /vehicles/{id} [get]
 func (h *VehicleHandler) GetVehicleByID(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
@@ -119,6 +164,30 @@ func (h *VehicleHandler) GetVehicleByID(c *gin.Context) {
 	})
 }
 
+// UpdateVehicle godoc
+// @Summary Update kendaraan
+// @Description Memperbarui data kendaraan milik user yang login berdasarkan ID (multipart/form-data)
+// @Tags Vehicles
+// @Accept multipart/form-data
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID kendaraan"
+// @Param brand_id formData int true "ID brand"
+// @Param model_id formData int true "ID model"
+// @Param license_plate formData string true "Nomor plat"
+// @Param manufacturing_year formData int true "Tahun pembuatan"
+// @Param color formData string false "Warna"
+// @Param purchase_date formData string true "Tanggal pembelian (YYYY-MM-DD)"
+// @Param engine_number formData string true "Nomor mesin"
+// @Param current_mileage formData int true "Kilometer saat ini"
+// @Param status formData string false "Status (active/inactive)"
+// @Param image_url formData file false "Foto kendaraan (png, jpg, jpeg, webp, max 5MB)"
+// @Success 200 {object} map[string]interface{} "Data kendaraan berhasil diupdate"
+// @Failure 400 {object} map[string]interface{} "request body tidak valid"
+// @Failure 401 {object} map[string]interface{} "token tidak valid"
+// @Failure 404 {object} map[string]interface{} "kendaraan tidak ditemukan"
+// @Failure 413 {object} map[string]interface{} "ukuran file melebihi batas"
+// @Router /vehicles/{id} [put]
 func (h *VehicleHandler) UpdateVehicle(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
@@ -174,6 +243,19 @@ func (h *VehicleHandler) UpdateVehicle(c *gin.Context) {
 	})
 }
 
+// DeleteVehicle godoc
+// @Summary Hapus kendaraan
+// @Description Menghapus data kendaraan milik user yang login berdasarkan ID
+// @Tags Vehicles
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID kendaraan"
+// @Success 200 {object} map[string]interface{} "berhasil hapus data kendaraan"
+// @Failure 400 {object} map[string]interface{} "id tidak valid"
+// @Failure 401 {object} map[string]interface{} "token tidak valid"
+// @Failure 404 {object} map[string]interface{} "kendaraan tidak ditemukan"
+// @Router /vehicles/{id} [delete]
 func (h *VehicleHandler) DeleteVehicle(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {

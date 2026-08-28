@@ -22,6 +22,19 @@ func NewServiceRecordHandler(service service.ServiceRecordService) *ServiceRecor
 	return &ServiceRecordHandler{service: service}
 }
 
+// CreateServiceRecord godoc
+// @Summary Buat record servis
+// @Description Membuat data record servis baru untuk user yang login
+// @Tags Service Record
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body dto.CreateServiceRecordRequest true "Data record servis"
+// @Success 201 {object} map[string]interface{} "Data record servis berhasil dibuat"
+// @Failure 400 {object} map[string]interface{} "request body tidak valid"
+// @Failure 401 {object} map[string]interface{} "token tidak valid"
+// @Failure 404 {object} map[string]interface{} "kendaraan atau jenis servis tidak ditemukan"
+// @Router /service-records [post]
 func (h *ServiceRecordHandler) CreateServiceRecord(c *gin.Context) {
 	var req dto.CreateServiceRecordRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -65,6 +78,16 @@ func (h *ServiceRecordHandler) CreateServiceRecord(c *gin.Context) {
 	})
 }
 
+// GetServiceRecords godoc
+// @Summary Ambil semua record servis user
+// @Description Mengambil daftar record servis milik user yang login
+// @Tags Service Record
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} map[string]interface{} "Data record servis berhasil diambil"
+// @Failure 401 {object} map[string]interface{} "token tidak valid"
+// @Router /service-records [get]
 func (h *ServiceRecordHandler) GetServiceRecords(c *gin.Context) {
 	userID := c.GetInt64(middleware.UserIDKey)
 	records, err := h.service.GetServiceRecords(c.Request.Context(), userID)
@@ -81,6 +104,19 @@ func (h *ServiceRecordHandler) GetServiceRecords(c *gin.Context) {
 	})
 }
 
+// GetServiceRecordById godoc
+// @Summary Ambil record servis berdasarkan ID
+// @Description Mengambil data record servis milik user yang login berdasarkan ID
+// @Tags Service Record
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID record servis"
+// @Success 200 {object} map[string]interface{} "Data record servis berhasil diambil"
+// @Failure 400 {object} map[string]interface{} "id tidak valid"
+// @Failure 401 {object} map[string]interface{} "token tidak valid"
+// @Failure 404 {object} map[string]interface{} "record servis tidak ditemukan"
+// @Router /service-records/{id} [get]
 func (h *ServiceRecordHandler) GetServiceRecordById(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
@@ -111,6 +147,20 @@ func (h *ServiceRecordHandler) GetServiceRecordById(c *gin.Context) {
 	})
 }
 
+// UpdateServiceRecord godoc
+// @Summary Update record servis
+// @Description Memperbarui data record servis milik user yang login berdasarkan ID
+// @Tags Service Record
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID record servis"
+// @Param request body dto.UpdateServiceRecordRequest true "Data record servis"
+// @Success 200 {object} map[string]interface{} "Data record servis berhasil diupdate"
+// @Failure 400 {object} map[string]interface{} "request body tidak valid"
+// @Failure 401 {object} map[string]interface{} "token tidak valid"
+// @Failure 404 {object} map[string]interface{} "record servis tidak ditemukan"
+// @Router /service-records/{id} [put]
 func (h *ServiceRecordHandler) UpdateServiceRecord(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
@@ -168,6 +218,19 @@ func (h *ServiceRecordHandler) UpdateServiceRecord(c *gin.Context) {
 	})
 }
 
+// DeleteServiceRecord godoc
+// @Summary Hapus record servis
+// @Description Menghapus data record servis milik user yang login berdasarkan ID
+// @Tags Service Record
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID record servis"
+// @Success 200 {object} map[string]interface{} "berhasil hapus data record servis"
+// @Failure 400 {object} map[string]interface{} "id tidak valid"
+// @Failure 401 {object} map[string]interface{} "token tidak valid"
+// @Failure 404 {object} map[string]interface{} "record servis tidak ditemukan"
+// @Router /service-records/{id} [delete]
 func (h *ServiceRecordHandler) DeleteServiceRecord(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {

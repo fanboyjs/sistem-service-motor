@@ -22,6 +22,19 @@ func NewVehicleTaxHandler(service service.VehicleTaxService) *VehicleTaxHandler 
 	return &VehicleTaxHandler{service: service}
 }
 
+// CreateVehicleTax godoc
+// @Summary Buat pajak kendaraan
+// @Description Membuat data pajak kendaraan baru untuk user yang login
+// @Tags Vehicle Tax
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body dto.CreateVehicleTaxRequest true "Data pajak kendaraan"
+// @Success 201 {object} map[string]interface{} "Data pajak kendaraan berhasil dibuat"
+// @Failure 400 {object} map[string]interface{} "request body tidak valid"
+// @Failure 401 {object} map[string]interface{} "token tidak valid"
+// @Failure 404 {object} map[string]interface{} "kendaraan tidak ditemukan"
+// @Router /vehicle-taxes [post]
 func (h *VehicleTaxHandler) CreateVehicleTax(c *gin.Context) {
 	var req dto.CreateVehicleTaxRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -59,6 +72,16 @@ func (h *VehicleTaxHandler) CreateVehicleTax(c *gin.Context) {
 	})
 }
 
+// GetVehicleTaxes godoc
+// @Summary Ambil semua pajak kendaraan user
+// @Description Mengambil daftar pajak kendaraan milik user yang login
+// @Tags Vehicle Tax
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} map[string]interface{} "Data pajak kendaraan berhasil diambil"
+// @Failure 401 {object} map[string]interface{} "token tidak valid"
+// @Router /vehicle-taxes [get]
 func (h *VehicleTaxHandler) GetVehicleTaxes(c *gin.Context) {
 	userID := c.GetInt64(middleware.UserIDKey)
 	taxes, err := h.service.GetVehicleTaxes(c.Request.Context(), userID)
@@ -75,6 +98,19 @@ func (h *VehicleTaxHandler) GetVehicleTaxes(c *gin.Context) {
 	})
 }
 
+// GetVehicleTaxById godoc
+// @Summary Ambil pajak kendaraan berdasarkan ID
+// @Description Mengambil data pajak kendaraan milik user yang login berdasarkan ID
+// @Tags Vehicle Tax
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID pajak"
+// @Success 200 {object} map[string]interface{} "Data pajak kendaraan berhasil diambil"
+// @Failure 400 {object} map[string]interface{} "id tidak valid"
+// @Failure 401 {object} map[string]interface{} "token tidak valid"
+// @Failure 404 {object} map[string]interface{} "pajak kendaraan tidak ditemukan"
+// @Router /vehicle-taxes/{id} [get]
 func (h *VehicleTaxHandler) GetVehicleTaxById(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
@@ -105,6 +141,20 @@ func (h *VehicleTaxHandler) GetVehicleTaxById(c *gin.Context) {
 	})
 }
 
+// UpdateVehicleTax godoc
+// @Summary Update pajak kendaraan
+// @Description Memperbarui data pajak kendaraan milik user yang login berdasarkan ID
+// @Tags Vehicle Tax
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID pajak"
+// @Param request body dto.UpdateVehicleTaxRequest true "Data pajak kendaraan"
+// @Success 200 {object} map[string]interface{} "Data pajak kendaraan berhasil diupdate"
+// @Failure 400 {object} map[string]interface{} "request body tidak valid"
+// @Failure 401 {object} map[string]interface{} "token tidak valid"
+// @Failure 404 {object} map[string]interface{} "pajak kendaraan tidak ditemukan"
+// @Router /vehicle-taxes/{id} [put]
 func (h *VehicleTaxHandler) UpdateVehicleTax(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
@@ -156,6 +206,19 @@ func (h *VehicleTaxHandler) UpdateVehicleTax(c *gin.Context) {
 	})
 }
 
+// DeleteVehicleTax godoc
+// @Summary Hapus pajak kendaraan
+// @Description Menghapus data pajak kendaraan milik user yang login berdasarkan ID
+// @Tags Vehicle Tax
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID pajak"
+// @Success 200 {object} map[string]interface{} "berhasil hapus data pajak kendaraan"
+// @Failure 400 {object} map[string]interface{} "id tidak valid"
+// @Failure 401 {object} map[string]interface{} "token tidak valid"
+// @Failure 404 {object} map[string]interface{} "pajak kendaraan tidak ditemukan"
+// @Router /vehicle-taxes/{id} [delete]
 func (h *VehicleTaxHandler) DeleteVehicleTax(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {

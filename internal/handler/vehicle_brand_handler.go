@@ -33,6 +33,20 @@ func NewVehicleBrandHandler(service service.VehicleBrandService) *VehicleBrandHa
 	return &VehicleBrandHandler{service: service}
 }
 
+// CreateVehicleBrand godoc
+// @Summary Buat brand kendaraan
+// @Description Membuat data brand kendaraan baru dengan upload logo
+// @Tags Vehicle Brand
+// @Accept multipart/form-data
+// @Produce json
+// @Security BearerAuth
+// @Param name formData string true "Nama brand"
+// @Param logo_url formData file false "File logo (png, jpg, jpeg, webp, max 5MB)"
+// @Success 201 {object} map[string]interface{} "Data brand kendaraan berhasil dibuat"
+// @Failure 400 {object} map[string]interface{} "request body tidak valid"
+// @Failure 401 {object} map[string]interface{} "token tidak valid"
+// @Failure 409 {object} map[string]interface{} "nama brand sudah terdaftar"
+// @Router /vehicle-brands [post]
 func (h *VehicleBrandHandler) CreateVehicleBrand(c *gin.Context) {
 	c.Request.Body = http.MaxBytesReader(c.Writer, c.Request.Body, maxLogoSize)
 	if err := c.Request.ParseMultipartForm(maxLogoSize); err != nil {
@@ -100,6 +114,16 @@ func (h *VehicleBrandHandler) CreateVehicleBrand(c *gin.Context) {
 	})
 }
 
+// GetVehicleBrands godoc
+// @Summary Ambil semua brand kendaraan
+// @Description Mengambil daftar semua brand kendaraan
+// @Tags Vehicle Brand
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} map[string]interface{} "Data brand kendaraan berhasil diambil"
+// @Failure 401 {object} map[string]interface{} "token tidak valid"
+// @Router /vehicle-brands [get]
 func (h *VehicleBrandHandler) GetVehicleBrands(c *gin.Context) {
 	brands, err := h.service.GetVehicleBrands(c.Request.Context())
 	if err != nil {
@@ -115,6 +139,19 @@ func (h *VehicleBrandHandler) GetVehicleBrands(c *gin.Context) {
 	})
 }
 
+// GetVehicleBrandById godoc
+// @Summary Ambil brand kendaraan berdasarkan ID
+// @Description Mengambil data brand kendaraan berdasarkan ID
+// @Tags Vehicle Brand
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID brand"
+// @Success 200 {object} map[string]interface{} "Data brand kendaraan berhasil diambil"
+// @Failure 400 {object} map[string]interface{} "id tidak valid"
+// @Failure 401 {object} map[string]interface{} "token tidak valid"
+// @Failure 404 {object} map[string]interface{} "brand kendaraan tidak ditemukan"
+// @Router /vehicle-brands/{id} [get]
 func (h *VehicleBrandHandler) GetVehicleBrandById(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
@@ -144,6 +181,22 @@ func (h *VehicleBrandHandler) GetVehicleBrandById(c *gin.Context) {
 	})
 }
 
+// UpdateVehicleBrand godoc
+// @Summary Update brand kendaraan
+// @Description Memperbarui data brand kendaraan berdasarkan ID (opsional upload logo baru)
+// @Tags Vehicle Brand
+// @Accept multipart/form-data
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID brand"
+// @Param name formData string true "Nama brand"
+// @Param logo_url formData file false "File logo (png, jpg, jpeg, webp, max 5MB)"
+// @Success 200 {object} map[string]interface{} "Data brand kendaraan berhasil diupdate"
+// @Failure 400 {object} map[string]interface{} "request body tidak valid"
+// @Failure 401 {object} map[string]interface{} "token tidak valid"
+// @Failure 404 {object} map[string]interface{} "brand kendaraan tidak ditemukan"
+// @Failure 409 {object} map[string]interface{} "nama brand sudah terdaftar"
+// @Router /vehicle-brands/{id} [put]
 func (h *VehicleBrandHandler) UpdateVehicleBrand(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {

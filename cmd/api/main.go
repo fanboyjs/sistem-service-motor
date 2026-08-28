@@ -15,6 +15,17 @@ import (
 	"example.com/my-api/internal/storage"
 )
 
+// @title Sistem Service Motor API
+// @version 1.0
+// @description Backend API untuk sistem service motor. Sebagian besar endpoint membutuhkan token JWT (Bearer) yang diperoleh dari login/register.
+// @host localhost:8080
+// @BasePath /api
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Masukkan token JWT dengan format: `Bearer <token>`
+
 func main() {
 	if err := godotenv.Load(); err != nil {
 		log.Println(".env not found")

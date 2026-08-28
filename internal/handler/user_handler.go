@@ -22,6 +22,17 @@ func NewUserHandler(service service.UserService) *UserHandler {
 	return &UserHandler{service: service}
 }
 
+// GetUserInfo godoc
+// @Summary Ambil data user saat ini
+// @Description Mengambil data user berdasarkan token JWT
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} map[string]interface{} "Data user berhasil diambil"
+// @Failure 401 {object} map[string]interface{} "token tidak valid"
+// @Failure 404 {object} map[string]interface{} "user tidak ditemukan"
+// @Router /user-info [get]
 func (h *UserHandler) GetUserInfo(c *gin.Context) {
 	userID := c.GetInt64(middleware.UserIDKey)
 
@@ -45,6 +56,18 @@ func (h *UserHandler) GetUserInfo(c *gin.Context) {
 	})
 }
 
+// CreateUser godoc
+// @Summary Buat user baru
+// @Description Membuat data user baru (admin)
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body dto.CreateUserRequest true "Data user"
+// @Success 201 {object} map[string]interface{} "Data user berhasil dibuat"
+// @Failure 400 {object} map[string]interface{} "request body tidak valid"
+// @Failure 401 {object} map[string]interface{} "token tidak valid"
+// @Router /users [post]
 func (h *UserHandler) CreateUser(c *gin.Context) {
 	var req dto.CreateUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -76,6 +99,16 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 
 }
 
+// GetUsers godoc
+// @Summary Ambil semua user
+// @Description Mengambil daftar semua user (admin)
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} map[string]interface{} "Data user berhasil diambil"
+// @Failure 401 {object} map[string]interface{} "token tidak valid"
+// @Router /users [get]
 func (h *UserHandler) GetUsers(c *gin.Context) {
 	users, err := h.service.GetUsers(c.Request.Context())
 	if err != nil {
@@ -91,6 +124,19 @@ func (h *UserHandler) GetUsers(c *gin.Context) {
 	})
 }
 
+// GetUserById godoc
+// @Summary Ambil user berdasarkan ID
+// @Description Mengambil data user berdasarkan ID (admin)
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID user"
+// @Success 200 {object} map[string]interface{} "Data user berhasil diambil"
+// @Failure 400 {object} map[string]interface{} "id tidak valid"
+// @Failure 401 {object} map[string]interface{} "token tidak valid"
+// @Failure 404 {object} map[string]interface{} "user tidak ditemukan"
+// @Router /users/{id} [get]
 func (h *UserHandler) GetUserById(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
@@ -120,6 +166,20 @@ func (h *UserHandler) GetUserById(c *gin.Context) {
 	})
 }
 
+// UpdateUser godoc
+// @Summary Update user
+// @Description Memperbarui data user berdasarkan ID (admin)
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID user"
+// @Param request body dto.UpdateUserRequest true "Data user"
+// @Success 200 {object} map[string]interface{} "Data user berhasil diupdate"
+// @Failure 400 {object} map[string]interface{} "request body tidak valid"
+// @Failure 401 {object} map[string]interface{} "token tidak valid"
+// @Failure 404 {object} map[string]interface{} "user tidak ditemukan"
+// @Router /users/{id} [put]
 func (h *UserHandler) UpdateUser(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
@@ -164,6 +224,19 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 	})
 }
 
+// DeleteUser godoc
+// @Summary Hapus user
+// @Description Menghapus data user berdasarkan ID (admin)
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "ID user"
+// @Success 200 {object} map[string]interface{} "berhasil hapus data user"
+// @Failure 400 {object} map[string]interface{} "id tidak valid"
+// @Failure 401 {object} map[string]interface{} "token tidak valid"
+// @Failure 404 {object} map[string]interface{} "user tidak ditemukan"
+// @Router /users/{id} [delete]
 func (h *UserHandler) DeleteUser(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {

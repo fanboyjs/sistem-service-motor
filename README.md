@@ -62,6 +62,21 @@ APP_ENV=testing go run ./cmd/api
 
 > Windows (cmd/PowerShell): `$env:APP_ENV="testing"; go run ./cmd/api`
 
+### Dokumentasi API (Swagger)
+
+Dokumentasi API interaktif tersedia setelah server berjalan:
+
+- UI Swagger: `http://localhost:8080/swagger/index.html`
+
+Dokumentasi dibuat otomatis dari anotasi kode memakai [swaggo](https://github.com/swaggo/swag). Saat ada perubahan pada handler atau DTO, regenerasi docs dengan:
+
+```bash
+go install github.com/swaggo/swag/cmd/swag@latest
+swag init -g cmd/api/main.go -o docs
+```
+
+Host dinamis pada docs mengikuti `PUBLIC_BASE_URL` sehingga akurat saat di-deploy ke production.
+
 ### Hot reload (Air)
 
 Untuk development, install [Air](https://github.com/air-verse/air) lalu jalankan:
