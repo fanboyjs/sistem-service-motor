@@ -132,7 +132,9 @@ Di **Settings → Secrets and variables → Actions** — **wajib dibuat**, tanp
 
 ## Deploy ke Railway
 
-Deploy otomatis ke [Railway](https://railway.app) saat **merge ke branch `main`**. Job `deploy-railway` menjalankan Railway CLI (`railway up --service=api --environment production`) dari CI, membangun image dari `Dockerfile` (sesuai `railway.json`) lalu men-deploy ke service **api** pada project Railway yang sudah ter-link. Config build & healthcheck ada di `railway.json`.
+Deploy otomatis ke [Railway](https://railway.app) saat **merge ke branch `main`**. Job `deploy-railway` menjalankan Railway CLI (`railway up --service=<SERVICE_ID> --environment production`) dari CI, membangun image dari `Dockerfile` (sesuai `railway.json`) lalu men-deploy ke service target pada project Railway yang sudah ter-link. Config build & healthcheck ada di `railway.json`.
+
+> Catatan: `--service` memakai **Service ID** Railway (bukan nama) agar selalu menemukan service yang benar meskipun nama berubah.
 
 > **Catatan storage:** filesystem Railway bersifat **ephemeral** — file upload (`uploads/`) hilang saat redeploy/restart. Gunakan object storage (S3/R2) jika butuh file persisten.
 

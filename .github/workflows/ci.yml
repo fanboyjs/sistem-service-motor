@@ -77,4 +77,4 @@ jobs:
       - name: Build dan deploy ke Railway
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        run: railway up --service=api --environment production --detach
+        run: railway up --service=308e966b-41a7-4db7-bed6-023a82bc664f --environment production --detach
