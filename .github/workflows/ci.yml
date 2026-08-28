@@ -59,57 +59,43 @@ jobs:
           NEON_URL: ${{ secrets.NEON_PRODUCTION_URL }}
         run: migrate -path migrations -database "$NEON_URL" -verbose up
 
-  check-deploy:
+  deploy-koyeb:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: [test, migrate-production]
     runs-on: ubuntu-latest
-    outputs:
-      ready: ${{ steps.check.outputs.ready }}
-    steps:
-      - name: Cek konfigurasi VPS
-        id: check
-        env:
-          VPS_HOST: ${{ secrets.VPS_HOST }}
-          VPS_USER: ${{ secrets.VPS_USER }}
-          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
-          VPS_DATABASE_URL: ${{ secrets.VPS_DATABASE_URL }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-        run: |
-          if [ -n "$VPS_HOST" ] && [ -n "$VPS_USER" ] && [ -n "$VPS_SSH_KEY" ] && [ -n "$VPS_DATABASE_URL" ] && [ -n "$JWT_SECRET" ]; then
-            echo "ready=true" >> "$GITHUB_OUTPUT"
-            echo "VPS terkonfigurasi, deploy akan dijalankan."
-          else
-            echo "ready=false" >> "$GITHUB_OUTPUT"
-            echo "::warning::Secret VPS belum lengkap, job deploy dilewati."
-          fi
-
-  deploy:
-    if: needs.check-deploy.outputs.ready == 'true'
-    needs: [check-deploy]
-    runs-on: ubuntu-latest
+    concurrency:
+      group: koyeb-deploy
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - name: Validasi secret KOYEB_API_TOKEN
+        env:
+          KOYEB_TOKEN: ${{ secrets.KOYEB_API_TOKEN }}
+        run: |
+          test -n "$KOYEB_TOKEN" || { echo "::error::Secret KOYEB_API_TOKEN belum di-set di Settings > Secrets > Actions"; exit 1; }
+      - name: Install dan konfigurasi Koyeb CLI
+        uses: koyeb-community/koyeb-actions@v2
         with:
-          go-version: '1.25'
-      - name: Build binary linux/amd64
-        run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath -o server ./cmd/api
-      - name: Copy binary ke VPS
-        uses: appleboy/scp-action@v0.1.7
+          api_token: "${{ secrets.KOYEB_API_TOKEN }}"
+      - name: Buat secret DATABASE_URL di Koyeb
+        uses: koyeb/action-git-deploy/secret@v1
         with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          source: 'server'
-          target: '/home/${{ secrets.VPS_USER }}/apps/sistem-service-motor'
-      - name: Deploy & restart service
-        uses: appleboy/ssh-action@v1.0.3
+          secret-name: DATABASE_URL
+          secret-value: "${{ secrets.NEON_PRODUCTION_URL }}"
+      - name: Buat secret JWT_SECRET di Koyeb
+        uses: koyeb/action-git-deploy/secret@v1
         with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          script: |
-            cd /home/${{ secrets.VPS_USER }}/apps/sistem-service-motor
-            printf 'APP_ENV=production\nAPP_PORT=8080\nDATABASE_URL=%s\nJWT_SECRET=%s\nJWT_EXPIRY=24h\nUPLOAD_DIR=uploads\n' "${{ secrets.VPS_DATABASE_URL }}" "${{ secrets.JWT_SECRET }}" > .env
-            chmod +x server
-            sudo systemctl restart sistem-service-motor
+          secret-name: JWT_SECRET
+          secret-value: "${{ secrets.JWT_SECRET }}"
+      - name: Build dan deploy ke Koyeb
+        uses: koyeb/action-git-deploy@v1
+        with:
+          git-url: github.com/fandipratamaa/sistem-service-motor
+          git-branch: main
+          git-builder: docker
+          app-name: sistem-service-motor
+          service-name: api
+          service-env: APP_ENV=production,APP_PORT=8080,APP_EXPOSE_PORT=8080,JWT_EXPIRY=24h,UPLOAD_DIR=uploads,DATABASE_URL=@DATABASE_URL,JWT_SECRET=@JWT_SECRET
+          service-ports: "8080:http"
+          service-routes: "/:8080"
+          service-checks: "8080:http:/"

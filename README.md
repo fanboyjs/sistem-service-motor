@@ -39,7 +39,7 @@ cp .env.example .env
 
 3. Isi `JWT_SECRET` di `.env` dengan random string kuat (contoh: `openssl rand -hex 32`).
 
-> **Penting:** jika `JWT_SECRET` tidak diisi, kode jatuh ke default `secret` yang **tidak aman untuk production** — siapapun bisa memalsukan token JWT. Set `JWT_SECRET` wajib dilakukan di `.env` lokal dan di `.env` VPS (lewat secret GitHub `JWT_SECRET`, lihat tabel secrets). Nilai yang sama dipakai untuk memverifikasi token.
+> **Penting:** jika `JWT_SECRET` tidak diisi, kode jatuh ke default `secret` yang **tidak aman untuk production** — siapapun bisa memalsukan token JWT. Set `JWT_SECRET` wajib dilakukan di `.env` lokal dan sebagai GitHub secret `JWT_SECRET` (yang otomatis disinkronkan ke Koyeb Secret, lihat tabel secrets). Nilai yang sama dipakai untuk memverifikasi token.
 
 3. Jalankan migrasi (pakai direct URL):
 
@@ -105,14 +105,14 @@ Alur otomatis di `.github/workflows/ci.yml` — cabang GitHub memetakan branch N
 | ------------------------------ | ------------------------------------------------ |
 | PR ke `main` / `test`          | Test (vet + build)                               |
 | Push ke branch `test`          | Test + migrasi ke branch **testing** Neon        |
-| Push ke branch `main`          | Test + migrasi branch **production** + deploy VPS |
+| Push ke branch `main`          | Test + migrasi branch **production** + deploy Koyeb |
 
 Alur kerja harian:
 
 ```text
 fitur → push ke test          → CI migrasi Neon testing, tes manual dari laptop
       → PR test → main        → job test jalan
-      → merge ke main         → CI migrasi Neon production + deploy VPS
+      → merge ke main         → CI migrasi Neon production + deploy Koyeb
 ```
 
 App testing tetap dijalankan manual dari local (`APP_ENV=testing go run ./cmd/api`).
@@ -125,66 +125,33 @@ Di **Settings → Secrets and variables → Actions** — **wajib dibuat**, tanp
 | ---------------------- | ------------------------------------------------ |
 | `NEON_TESTING_URL`     | Direct URL branch testing                        |
 | `NEON_PRODUCTION_URL`  | Direct URL branch production                     |
-| `VPS_HOST`             | IP VPS Rumahweb (**wajib untuk deploy**)         |
-| `VPS_USER`             | User deploy di VPS (**wajib untuk deploy**)      |
-| `VPS_SSH_KEY`          | Private key SSH (**wajib untuk deploy**)         |
-| `VPS_DATABASE_URL`     | Direct URL production (**wajib untuk deploy**)   |
+| `KOYEB_API_TOKEN`      | Personal Access Token Koyeb (**wajib untuk deploy**) |
 | `JWT_SECRET`           | Random string kuat untuk memverifikasi token JWT (**wajib untuk deploy**) |
 
 > Migrasi di CI memakai binary [golang-migrate v4.19.1](https://github.com/golang-migrate/migrate/releases) yang diunduh di runner, bukan container Docker.
 
-> **Deploy VPS otomatis di-skip** sampai kelima secret VPS di-set (`VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY`, `VPS_DATABASE_URL`, `JWT_SECRET`). Begitu VPS siap dan secret dibuat, job `deploy` langsung aktif tanpa ubah kode.
+## Deploy ke Koyeb
 
-## Deploy ke VPS (cth:Rumahweb)
+Deploy otomatis ke [Koyeb](https://www.koyeb.com) saat **merge ke branch `main`**. Job `deploy-koyeb` membangun image dari `Dockerfile` (builder `docker`) lalu membuat/memperbarui App & Service **sistem-service-motor** dengan env var dari Koyeb Secrets.
 
-Setup satu kali (manual):
+> **Catatan storage:** filesystem Koyeb bersifat **ephemeral** — file upload (`uploads/`) hilang saat redeploy/restart. Gunakan object storage (S3/R2) jika butuh file persisten.
 
-1. **Folder app** di VPS:
+### Setup satu kali (manual)
 
-```bash
-mkdir -p /home/<user>/apps/sistem-service-motor
-```
+1. **Buat Personal Access Token Koyeb** (Dashboard Koyeb → Account → API/Token). Simpan sebagai GitHub secret `KOYEB_API_TOKEN`.
 
-2. **SSH key** — generate di lokal:
+2. Pastikan GitHub secret berikut sudah dibuat:
+   - `NEON_PRODUCTION_URL` — Direct URL branch production Neon
+   - `JWT_SECRET` — random string kuat (sama dengan yang dipakai lokal)
 
-```bash
-ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519_deploy -C "deploy"
-```
+3. Jalankan sekali job `deploy-koyeb` (mis. push dummy ke `main`). Koyeb akan otomatis:
+   - Membuat Koyeb Secrets `DATABASE_URL` (dari `NEON_PRODUCTION_URL`) dan `JWT_SECRET`.
+   - Membuat App `sistem-service-motor` + Service `api` yang membangun image dari Dockerfile, mengekspos port `8080`, dan route `/`.
 
-Salin pubkey (`~/.ssh/id_ed25519_deploy.pub`) ke `/home/<user>/.ssh/authorized_keys` di VPS. Isi private key ke secret `VPS_SSH_KEY`.
+4. Setelah deploy pertama berhasil, ambil **Public URL** untuk diisi sebagai env/QR code publik:
+   - `PUBLIC_BASE_URL` (optional) di env service = Public URL Koyeb (mis. `https://sistem-service-motor-<org>.koyeb.app`).
 
-3. **Systemd unit** `/etc/systemd/system/sistem-service-motor.service`:
-
-```ini
-[Unit]
-Description=Sistem Service Motor API
-After=network.target
-
-[Service]
-Type=simple
-User=<user>
-WorkingDirectory=/home/<user>/apps/sistem-service-motor
-EnvironmentFile=/home/<user>/apps/sistem-service-motor/.env
-ExecStart=/home/<user>/apps/sistem-service-motor/server
-Restart=always
-RestartSec=3
-
-[Install]
-WantedBy=multi-user.target
-```
-
-4. **Aktifkan service**:
-
-```bash
-sudo systemctl daemon-reload
-sudo systemctl enable --now sistem-service-motor
-```
-
-5. (Opsional) Pasang nginx/caddy sebagai reverse proxy + domain ke port `8080`.
-
-### Deploy ke production
-
-Setelah semua setup di atas, deploy & migrasi production berjalan otomatis saat **merge ke branch `main`**. Tidak perlu tag versi.
+App tersedia di Public URL yang diberikan Koyeb (domain `.koyeb.app`). Untuk domain custom, buka App → Settings → Domains di dashboard Koyeb.
 
 ## PostgreSQL lokal (opsional)
 
