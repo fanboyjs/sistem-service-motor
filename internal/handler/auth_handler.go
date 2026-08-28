@@ -18,6 +18,17 @@ func NewAuthHandler(service service.AuthService) *AuthHandler {
 	return &AuthHandler{service: service}
 }
 
+// Register godoc
+// @Summary Register pengguna baru
+// @Description Mendaftarkan akun baru dan mengembalikan token JWT
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param request body dto.RegisterRequest true "Data registrasi"
+// @Success 201 {object} map[string]interface{} "register berhasil"
+// @Failure 400 {object} map[string]interface{} "request body tidak valid"
+// @Failure 409 {object} map[string]interface{} "email sudah terdaftar"
+// @Router /register [post]
 func (h *AuthHandler) Register(c *gin.Context) {
 	var req dto.RegisterRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -57,6 +68,17 @@ func (h *AuthHandler) Register(c *gin.Context) {
 	})
 }
 
+// Login godoc
+// @Summary Login pengguna
+// @Description Login dengan email dan password untuk mendapatkan token JWT
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param request body dto.LoginRequest true "Data login"
+// @Success 200 {object} map[string]interface{} "login berhasil"
+// @Failure 400 {object} map[string]interface{} "request body tidak valid"
+// @Failure 401 {object} map[string]interface{} "kredensial tidak valid"
+// @Router /login [post]
 func (h *AuthHandler) Login(c *gin.Context) {
 	var req dto.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {

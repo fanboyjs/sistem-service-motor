@@ -1,0 +1,1859 @@
+basePath: /api
+definitions:
+  example_com_my-api_internal_dto.CreateServiceItemRequest:
+    properties:
+      cost:
+        type: number
+      name:
+        maxLength: 150
+        minLength: 1
+        type: string
+      notes:
+        type: string
+      quantity:
+        minimum: 1
+        type: integer
+      service_record_id:
+        type: integer
+    required:
+    - cost
+    - name
+    - notes
+    - quantity
+    - service_record_id
+    type: object
+  example_com_my-api_internal_dto.CreateServiceRecordRequest:
+    properties:
+      labor_cost:
+        minimum: 0
+        type: number
+      notes:
+        type: string
+      odometer:
+        minimum: 0
+        type: number
+      parts_cost:
+        minimum: 0
+        type: number
+      service_date:
+        type: string
+      service_type_id:
+        type: integer
+      vehicle_id:
+        type: integer
+      workshop_name:
+        maxLength: 150
+        minLength: 1
+        type: string
+    required:
+    - labor_cost
+    - notes
+    - odometer
+    - parts_cost
+    - service_date
+    - service_type_id
+    - vehicle_id
+    - workshop_name
+    type: object
+  example_com_my-api_internal_dto.CreateServiceTypeRequest:
+    properties:
+      description:
+        type: string
+      name:
+        maxLength: 100
+        minLength: 1
+        type: string
+    required:
+    - name
+    type: object
+  example_com_my-api_internal_dto.CreateUserRequest:
+    properties:
+      email:
+        maxLength: 255
+        type: string
+      name:
+        maxLength: 100
+        minLength: 3
+        type: string
+      phone:
+        maxLength: 20
+        type: string
+    required:
+    - email
+    - name
+    type: object
+  example_com_my-api_internal_dto.CreateVehicleModelRequest:
+    properties:
+      brand_id:
+        type: integer
+      name:
+        maxLength: 255
+        minLength: 1
+        type: string
+    required:
+    - brand_id
+    - name
+    type: object
+  example_com_my-api_internal_dto.CreateVehicleTaxRequest:
+    properties:
+      due_date:
+        type: string
+      notes:
+        type: string
+      other_amount:
+        minimum: 0
+        type: number
+      payment_date:
+        type: string
+      pkb_amount:
+        minimum: 0
+        type: number
+      status:
+        enum:
+        - paid
+        - unpaid
+        type: string
+      swdkllj_amount:
+        minimum: 0
+        type: number
+      tax_year:
+        maximum: 2100
+        type: integer
+      vehicle_id:
+        type: integer
+    required:
+    - due_date
+    - other_amount
+    - payment_date
+    - pkb_amount
+    - swdkllj_amount
+    - tax_year
+    - vehicle_id
+    type: object
+  example_com_my-api_internal_dto.LoginRequest:
+    properties:
+      email:
+        maxLength: 255
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  example_com_my-api_internal_dto.RegisterRequest:
+    properties:
+      email:
+        maxLength: 255
+        type: string
+      name:
+        maxLength: 100
+        minLength: 3
+        type: string
+      password:
+        minLength: 6
+        type: string
+    required:
+    - email
+    - name
+    - password
+    type: object
+  example_com_my-api_internal_dto.UpdateServiceItemRequest:
+    properties:
+      cost:
+        type: number
+      name:
+        maxLength: 150
+        minLength: 1
+        type: string
+      notes:
+        type: string
+      quantity:
+        minimum: 1
+        type: integer
+      service_record_id:
+        type: integer
+    required:
+    - cost
+    - name
+    - notes
+    - quantity
+    - service_record_id
+    type: object
+  example_com_my-api_internal_dto.UpdateServiceRecordRequest:
+    properties:
+      labor_cost:
+        minimum: 0
+        type: number
+      notes:
+        type: string
+      odometer:
+        minimum: 0
+        type: number
+      parts_cost:
+        minimum: 0
+        type: number
+      service_date:
+        type: string
+      service_type_id:
+        type: integer
+      vehicle_id:
+        type: integer
+      workshop_name:
+        maxLength: 150
+        minLength: 1
+        type: string
+    required:
+    - labor_cost
+    - notes
+    - odometer
+    - parts_cost
+    - service_date
+    - service_type_id
+    - vehicle_id
+    - workshop_name
+    type: object
+  example_com_my-api_internal_dto.UpdateServiceTypeRequest:
+    properties:
+      description:
+        type: string
+      name:
+        maxLength: 100
+        minLength: 1
+        type: string
+    required:
+    - name
+    type: object
+  example_com_my-api_internal_dto.UpdateUserRequest:
+    properties:
+      email:
+        maxLength: 255
+        type: string
+      name:
+        maxLength: 100
+        minLength: 3
+        type: string
+      phone:
+        maxLength: 20
+        type: string
+    required:
+    - email
+    - name
+    type: object
+  example_com_my-api_internal_dto.UpdateVehicleModelRequest:
+    properties:
+      brand_id:
+        type: integer
+      name:
+        maxLength: 255
+        minLength: 1
+        type: string
+    required:
+    - brand_id
+    - name
+    type: object
+  example_com_my-api_internal_dto.UpdateVehicleTaxRequest:
+    properties:
+      due_date:
+        type: string
+      notes:
+        type: string
+      other_amount:
+        minimum: 0
+        type: number
+      payment_date:
+        type: string
+      pkb_amount:
+        minimum: 0
+        type: number
+      status:
+        enum:
+        - paid
+        - unpaid
+        type: string
+      swdkllj_amount:
+        minimum: 0
+        type: number
+      tax_year:
+        maximum: 2100
+        type: integer
+      vehicle_id:
+        type: integer
+    required:
+    - due_date
+    - other_amount
+    - payment_date
+    - pkb_amount
+    - swdkllj_amount
+    - tax_year
+    - vehicle_id
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Backend API untuk sistem service motor. Sebagian besar endpoint membutuhkan
+    token JWT (Bearer) yang diperoleh dari login/register.
+  title: Sistem Service Motor API
+  version: "1.0"
+paths:
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Login dengan email dan password untuk mendapatkan token JWT
+      parameters:
+      - description: Data login
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/example_com_my-api_internal_dto.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: login berhasil
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: request body tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: kredensial tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Login pengguna
+      tags:
+      - Auth
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Mendaftarkan akun baru dan mengembalikan token JWT
+      parameters:
+      - description: Data registrasi
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/example_com_my-api_internal_dto.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: register berhasil
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: request body tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: email sudah terdaftar
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Register pengguna baru
+      tags:
+      - Auth
+  /service-items:
+    get:
+      consumes:
+      - application/json
+      description: Mengambil daftar semua item servis
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Data item servis berhasil diambil
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: token tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Ambil semua item servis
+      tags:
+      - Service Item
+    post:
+      consumes:
+      - application/json
+      description: Membuat data item servis baru
+      parameters:
+      - description: Data item servis
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/example_com_my-api_internal_dto.CreateServiceItemRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Data item servis berhasil dibuat
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: request body tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: token tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: record servis tidak ditemukan
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Buat item servis
+      tags:
+      - Service Item
+  /service-items/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Mengambil data item servis berdasarkan ID
+      parameters:
+      - description: ID item servis
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Data item servis berhasil diambil
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: id tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: token tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: item servis tidak ditemukan
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Ambil item servis berdasarkan ID
+      tags:
+      - Service Item
+    put:
+      consumes:
+      - application/json
+      description: Memperbarui data item servis berdasarkan ID
+      parameters:
+      - description: ID item servis
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Data item servis
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/example_com_my-api_internal_dto.UpdateServiceItemRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Data item servis berhasil diupdate
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: request body tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: token tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: item servis tidak ditemukan
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update item servis
+      tags:
+      - Service Item
+  /service-records:
+    get:
+      consumes:
+      - application/json
+      description: Mengambil daftar record servis milik user yang login
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Data record servis berhasil diambil
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: token tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Ambil semua record servis user
+      tags:
+      - Service Record
+    post:
+      consumes:
+      - application/json
+      description: Membuat data record servis baru untuk user yang login
+      parameters:
+      - description: Data record servis
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/example_com_my-api_internal_dto.CreateServiceRecordRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Data record servis berhasil dibuat
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: request body tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: token tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: kendaraan atau jenis servis tidak ditemukan
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Buat record servis
+      tags:
+      - Service Record
+  /service-records/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Menghapus data record servis milik user yang login berdasarkan
+        ID
+      parameters:
+      - description: ID record servis
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: berhasil hapus data record servis
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: id tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: token tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: record servis tidak ditemukan
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Hapus record servis
+      tags:
+      - Service Record
+    get:
+      consumes:
+      - application/json
+      description: Mengambil data record servis milik user yang login berdasarkan
+        ID
+      parameters:
+      - description: ID record servis
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Data record servis berhasil diambil
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: id tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: token tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: record servis tidak ditemukan
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Ambil record servis berdasarkan ID
+      tags:
+      - Service Record
+    put:
+      consumes:
+      - application/json
+      description: Memperbarui data record servis milik user yang login berdasarkan
+        ID
+      parameters:
+      - description: ID record servis
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Data record servis
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/example_com_my-api_internal_dto.UpdateServiceRecordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Data record servis berhasil diupdate
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: request body tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: token tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: record servis tidak ditemukan
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update record servis
+      tags:
+      - Service Record
+  /service-types:
+    get:
+      consumes:
+      - application/json
+      description: Mengambil daftar semua tipe servis
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Data tipe servis berhasil diambil
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: token tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Ambil semua tipe servis
+      tags:
+      - Service Type
+    post:
+      consumes:
+      - application/json
+      description: Membuat data tipe servis baru
+      parameters:
+      - description: Data tipe servis
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/example_com_my-api_internal_dto.CreateServiceTypeRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Data tipe servis berhasil dibuat
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: request body tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: token tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: nama tipe servis sudah terdaftar
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Buat tipe servis
+      tags:
+      - Service Type
+  /service-types/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Mengambil data tipe servis berdasarkan ID
+      parameters:
+      - description: ID tipe servis
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Data tipe servis berhasil diambil
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: id tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: token tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: tipe servis tidak ditemukan
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Ambil tipe servis berdasarkan ID
+      tags:
+      - Service Type
+    put:
+      consumes:
+      - application/json
+      description: Memperbarui data tipe servis berdasarkan ID
+      parameters:
+      - description: ID tipe servis
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Data tipe servis
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/example_com_my-api_internal_dto.UpdateServiceTypeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Data tipe servis berhasil diupdate
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: request body tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: token tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: tipe servis tidak ditemukan
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: nama tipe servis sudah terdaftar
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update tipe servis
+      tags:
+      - Service Type
+  /user-info:
+    get:
+      consumes:
+      - application/json
+      description: Mengambil data user berdasarkan token JWT
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Data user berhasil diambil
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: token tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: user tidak ditemukan
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Ambil data user saat ini
+      tags:
+      - Users
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: Mengambil daftar semua user (admin)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Data user berhasil diambil
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: token tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Ambil semua user
+      tags:
+      - Users
+    post:
+      consumes:
+      - application/json
+      description: Membuat data user baru (admin)
+      parameters:
+      - description: Data user
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/example_com_my-api_internal_dto.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Data user berhasil dibuat
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: request body tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: token tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Buat user baru
+      tags:
+      - Users
+  /users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Menghapus data user berdasarkan ID (admin)
+      parameters:
+      - description: ID user
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: berhasil hapus data user
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: id tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: token tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: user tidak ditemukan
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Hapus user
+      tags:
+      - Users
+    get:
+      consumes:
+      - application/json
+      description: Mengambil data user berdasarkan ID (admin)
+      parameters:
+      - description: ID user
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Data user berhasil diambil
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: id tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: token tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: user tidak ditemukan
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Ambil user berdasarkan ID
+      tags:
+      - Users
+    put:
+      consumes:
+      - application/json
+      description: Memperbarui data user berdasarkan ID (admin)
+      parameters:
+      - description: ID user
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Data user
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/example_com_my-api_internal_dto.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Data user berhasil diupdate
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: request body tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: token tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: user tidak ditemukan
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update user
+      tags:
+      - Users
+  /vehicle-brands:
+    get:
+      consumes:
+      - application/json
+      description: Mengambil daftar semua brand kendaraan
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Data brand kendaraan berhasil diambil
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: token tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Ambil semua brand kendaraan
+      tags:
+      - Vehicle Brand
+    post:
+      consumes:
+      - multipart/form-data
+      description: Membuat data brand kendaraan baru dengan upload logo
+      parameters:
+      - description: Nama brand
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: File logo (png, jpg, jpeg, webp, max 5MB)
+        in: formData
+        name: logo_url
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Data brand kendaraan berhasil dibuat
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: request body tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: token tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: nama brand sudah terdaftar
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Buat brand kendaraan
+      tags:
+      - Vehicle Brand
+  /vehicle-brands/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Mengambil data brand kendaraan berdasarkan ID
+      parameters:
+      - description: ID brand
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Data brand kendaraan berhasil diambil
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: id tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: token tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: brand kendaraan tidak ditemukan
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Ambil brand kendaraan berdasarkan ID
+      tags:
+      - Vehicle Brand
+    put:
+      consumes:
+      - multipart/form-data
+      description: Memperbarui data brand kendaraan berdasarkan ID (opsional upload
+        logo baru)
+      parameters:
+      - description: ID brand
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Nama brand
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: File logo (png, jpg, jpeg, webp, max 5MB)
+        in: formData
+        name: logo_url
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Data brand kendaraan berhasil diupdate
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: request body tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: token tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: brand kendaraan tidak ditemukan
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: nama brand sudah terdaftar
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update brand kendaraan
+      tags:
+      - Vehicle Brand
+  /vehicle-models:
+    get:
+      consumes:
+      - application/json
+      description: Mengambil daftar semua model kendaraan
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Data model kendaraan berhasil diambil
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: token tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Ambil semua model kendaraan
+      tags:
+      - Vehicle Model
+    post:
+      consumes:
+      - application/json
+      description: Membuat data model kendaraan baru yang terhubung ke brand
+      parameters:
+      - description: Data model kendaraan
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/example_com_my-api_internal_dto.CreateVehicleModelRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Data model kendaraan berhasil dibuat
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: request body tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: token tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: brand kendaraan tidak ditemukan
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: nama model kendaraan sudah terdaftar
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Buat model kendaraan
+      tags:
+      - Vehicle Model
+  /vehicle-models/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Mengambil data model kendaraan berdasarkan ID
+      parameters:
+      - description: ID model
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Data model kendaraan berhasil diambil
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: id tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: token tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: model kendaraan tidak ditemukan
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Ambil model kendaraan berdasarkan ID
+      tags:
+      - Vehicle Model
+    put:
+      consumes:
+      - application/json
+      description: Memperbarui data model kendaraan berdasarkan ID
+      parameters:
+      - description: ID model
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Data model kendaraan
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/example_com_my-api_internal_dto.UpdateVehicleModelRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Data model kendaraan berhasil diupdate
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: request body tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: token tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: model kendaraan tidak ditemukan
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: nama model kendaraan sudah terdaftar
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update model kendaraan
+      tags:
+      - Vehicle Model
+  /vehicle-taxes:
+    get:
+      consumes:
+      - application/json
+      description: Mengambil daftar pajak kendaraan milik user yang login
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Data pajak kendaraan berhasil diambil
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: token tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Ambil semua pajak kendaraan user
+      tags:
+      - Vehicle Tax
+    post:
+      consumes:
+      - application/json
+      description: Membuat data pajak kendaraan baru untuk user yang login
+      parameters:
+      - description: Data pajak kendaraan
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/example_com_my-api_internal_dto.CreateVehicleTaxRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Data pajak kendaraan berhasil dibuat
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: request body tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: token tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: kendaraan tidak ditemukan
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Buat pajak kendaraan
+      tags:
+      - Vehicle Tax
+  /vehicle-taxes/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Menghapus data pajak kendaraan milik user yang login berdasarkan
+        ID
+      parameters:
+      - description: ID pajak
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: berhasil hapus data pajak kendaraan
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: id tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: token tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: pajak kendaraan tidak ditemukan
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Hapus pajak kendaraan
+      tags:
+      - Vehicle Tax
+    get:
+      consumes:
+      - application/json
+      description: Mengambil data pajak kendaraan milik user yang login berdasarkan
+        ID
+      parameters:
+      - description: ID pajak
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Data pajak kendaraan berhasil diambil
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: id tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: token tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: pajak kendaraan tidak ditemukan
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Ambil pajak kendaraan berdasarkan ID
+      tags:
+      - Vehicle Tax
+    put:
+      consumes:
+      - application/json
+      description: Memperbarui data pajak kendaraan milik user yang login berdasarkan
+        ID
+      parameters:
+      - description: ID pajak
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Data pajak kendaraan
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/example_com_my-api_internal_dto.UpdateVehicleTaxRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Data pajak kendaraan berhasil diupdate
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: request body tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: token tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: pajak kendaraan tidak ditemukan
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update pajak kendaraan
+      tags:
+      - Vehicle Tax
+  /vehicles:
+    get:
+      consumes:
+      - application/json
+      description: Mengambil daftar kendaraan milik user yang login
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Data kendaraan berhasil diambil
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: token tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Ambil semua kendaraan user
+      tags:
+      - Vehicles
+    post:
+      consumes:
+      - multipart/form-data
+      description: Membuat data kendaraan baru milik user yang login (multipart/form-data)
+      parameters:
+      - description: ID brand
+        in: formData
+        name: brand_id
+        required: true
+        type: integer
+      - description: ID model
+        in: formData
+        name: model_id
+        required: true
+        type: integer
+      - description: Nomor plat
+        in: formData
+        name: license_plate
+        required: true
+        type: string
+      - description: Tahun pembuatan
+        in: formData
+        name: manufacturing_year
+        required: true
+        type: integer
+      - description: Warna
+        in: formData
+        name: color
+        type: string
+      - description: Tanggal pembelian (YYYY-MM-DD)
+        in: formData
+        name: purchase_date
+        required: true
+        type: string
+      - description: Nomor mesin
+        in: formData
+        name: engine_number
+        required: true
+        type: string
+      - description: Kilometer saat ini
+        in: formData
+        name: current_mileage
+        required: true
+        type: integer
+      - description: Status (active/inactive)
+        in: formData
+        name: status
+        type: string
+      - description: Foto kendaraan (png, jpg, jpeg, webp, max 5MB)
+        in: formData
+        name: image_url
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Data kendaraan berhasil dibuat
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: request body tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: token tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "413":
+          description: ukuran file melebihi batas
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Buat kendaraan
+      tags:
+      - Vehicles
+  /vehicles/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Menghapus data kendaraan milik user yang login berdasarkan ID
+      parameters:
+      - description: ID kendaraan
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: berhasil hapus data kendaraan
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: id tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: token tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: kendaraan tidak ditemukan
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Hapus kendaraan
+      tags:
+      - Vehicles
+    get:
+      consumes:
+      - application/json
+      description: Mengambil data kendaraan milik user yang login berdasarkan ID
+      parameters:
+      - description: ID kendaraan
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Data kendaraan berhasil diambil
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: id tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: token tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: kendaraan tidak ditemukan
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Ambil kendaraan berdasarkan ID
+      tags:
+      - Vehicles
+    put:
+      consumes:
+      - multipart/form-data
+      description: Memperbarui data kendaraan milik user yang login berdasarkan ID
+        (multipart/form-data)
+      parameters:
+      - description: ID kendaraan
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: ID brand
+        in: formData
+        name: brand_id
+        required: true
+        type: integer
+      - description: ID model
+        in: formData
+        name: model_id
+        required: true
+        type: integer
+      - description: Nomor plat
+        in: formData
+        name: license_plate
+        required: true
+        type: string
+      - description: Tahun pembuatan
+        in: formData
+        name: manufacturing_year
+        required: true
+        type: integer
+      - description: Warna
+        in: formData
+        name: color
+        type: string
+      - description: Tanggal pembelian (YYYY-MM-DD)
+        in: formData
+        name: purchase_date
+        required: true
+        type: string
+      - description: Nomor mesin
+        in: formData
+        name: engine_number
+        required: true
+        type: string
+      - description: Kilometer saat ini
+        in: formData
+        name: current_mileage
+        required: true
+        type: integer
+      - description: Status (active/inactive)
+        in: formData
+        name: status
+        type: string
+      - description: Foto kendaraan (png, jpg, jpeg, webp, max 5MB)
+        in: formData
+        name: image_url
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Data kendaraan berhasil diupdate
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: request body tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: token tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: kendaraan tidak ditemukan
+          schema:
+            additionalProperties: true
+            type: object
+        "413":
+          description: ukuran file melebihi batas
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update kendaraan
+      tags:
+      - Vehicles
+  /vehicles/qr/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Mengambil data kendaraan publik berdasarkan QR code
+      parameters:
+      - description: ID kendaraan
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Data kendaraan berhasil diambil
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: id tidak valid
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: kendaraan tidak ditemukan
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Ambil data kendaraan via QR code
+      tags:
+      - Vehicles
+securityDefinitions:
+  BearerAuth:
+    description: 'Masukkan token JWT dengan format: `Bearer <token>`'
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

@@ -1,17 +1,31 @@
 package route
 
 import (
+	"strings"
+
 	"github.com/gin-gonic/gin"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 
 	"example.com/my-api/config"
+	_ "example.com/my-api/docs"
 	"example.com/my-api/internal/handler"
 	"example.com/my-api/internal/middleware"
+
+	docs "example.com/my-api/docs"
 )
 
+// SetupRouter godoc
+// setup semua route api
 func SetupRouter(userHandler *handler.UserHandler, authHandler *handler.AuthHandler, vehicleBrandHandler *handler.VehicleBrandHandler, vehicleModelHandler *handler.VehicleModelHandler, vehicleHandler *handler.VehicleHandler, vehicleTaxHandler *handler.VehicleTaxHandler, vehicleQRHandler *handler.VehicleQRHandler, serviceTypeHandler *handler.ServiceTypeHandler, serviceItemHandler *handler.ServiceItemHandler, serviceRecordHandler *handler.ServiceRecordHandler, cfg config.Config) *gin.Engine {
 	router := gin.Default()
 
+	docs.SwaggerInfo.Host = strings.TrimPrefix(cfg.PublicBaseURL, "http://")
+	docs.SwaggerInfo.Host = strings.TrimPrefix(docs.SwaggerInfo.Host, "https://")
+
 	router.Static("/uploads", cfg.UploadDir)
+
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	api := router.Group("/api")
 	api.POST("/login", authHandler.Login)
